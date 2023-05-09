@@ -8,15 +8,12 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import jr.brian.issarecipeapp.model.local.PresetMeal
 import jr.brian.issarecipeapp.model.local.PresetMealNatType
 import jr.brian.issarecipeapp.util.HOME_ROUTE
 import jr.brian.issarecipeapp.util.MEAL_DETAILS_ROUTE
@@ -47,7 +44,9 @@ fun AppUI() {
     NavHost(navController = navController, startDestination = HOME_ROUTE, builder = {
         composable(HOME_ROUTE, content = {
             HomePage {
-                navController.navigate("$MEAL_DETAILS_ROUTE/${it.name}") {}
+                navController.navigate("$MEAL_DETAILS_ROUTE/${it.name}") {
+                    launchSingleTop = true
+                }
             }
         })
         composable(
