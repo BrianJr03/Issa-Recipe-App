@@ -140,7 +140,7 @@ fun MealDetails(
 
         Button(onClick = {
             scope.launch {
-                pagerState.scrollToPage(1)
+                pagerState.animateScrollToPage(1)
             }
         }) {
             Text("Generate")
@@ -176,7 +176,7 @@ fun RecipeResults(
 
         Button(onClick = {
             scope.launch {
-                pagerState.scrollToPage(0)
+                pagerState.animateScrollToPage(0)
             }
         }) {
             Text("Back")
