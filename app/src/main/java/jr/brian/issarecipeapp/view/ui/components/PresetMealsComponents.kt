@@ -21,30 +21,32 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import jr.brian.issarecipeapp.R
+import jr.brian.issarecipeapp.model.local.PresetMeal
 import jr.brian.issarecipeapp.model.local.presetMeals
+import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import jr.brian.issarecipeapp.view.ui.theme.PinkIsh
 
 @Composable
-fun PresetMealsRow() {
-    val isDialogShowing = remember { mutableStateOf(false) }
+fun PresetMealsRow(onItemClick: (PresetMeal) -> Unit) {
     LazyRow(content = {
         items(presetMeals.size) { index ->
             val presetMeal = presetMeals[index]
-            PresetMealDialog(presetMeal = presetMeal, isShowing = isDialogShowing)
             Box(
                 modifier = Modifier
                     .padding(10.dp)
-                    .size(200.dp)
+                    .size(150.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(presetMeal.boxColor)
-                    .clickable { isDialogShowing.value = !isDialogShowing.value },
+                    .background(BlueIsh)
+                    .clickable {
+                        onItemClick(presetMeal)
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_fastfood_24),
                         contentDescription = "",
-                        modifier = Modifier.size(100.dp),
+                        modifier = Modifier.size(75.dp),
                         tint = PinkIsh
                     )
                     Spacer(modifier = Modifier.height(30.dp))

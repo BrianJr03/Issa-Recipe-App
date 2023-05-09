@@ -59,38 +59,11 @@ fun PresetMealDialog(
     presetMeal: PresetMeal,
     isShowing: MutableState<Boolean>
 ) {
-    val servingSize = remember { mutableStateOf("") }
-    ShowDialog(
-        title = "Details",
-        content = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                OutlinedTextField(
-                    value = servingSize.value,
-                    onValueChange = {
-                        servingSize.value = it
-                    },
-                    label = {
-                        Text(
-                            text = "Serving Size",
-                            style = TextStyle(
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    },
-                    colors = TextFieldDefaults.textFieldColors(
-                        textColor = Color.White,
-                        focusedIndicatorColor = Color.White,
-                        unfocusedIndicatorColor = Color.White
-                    ),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = {
-                        isShowing.value = false
-                    })
-                )
 
-                Spacer(modifier = Modifier.height(25.dp))
-            }
+    ShowDialog(
+        title = "${presetMeal.name} Details",
+        content = {
+
         },
         confirmButton = {
             IconButton(onClick = {
