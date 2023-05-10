@@ -2,19 +2,15 @@ package jr.brian.issarecipeapp.view.ui.pages
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -26,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -130,95 +125,64 @@ fun MealDetails(
     pagerState: PagerState,
     scope: CoroutineScope
 ) {
-    val ingredientItems = remember {
-        mutableStateListOf<String>()
-    }
-
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "$mealName Details")
+        items(1) {
+            Text(text = "$mealName Details")
 
-        Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-        DetailTextField(
-            label = "Party Size",
-            value = partySize,
-            modifier = Modifier.fillMaxWidth()
-        )
+            DetailTextField(
+                label = "Party Size",
+                value = partySize,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
-        DetailTextField(
-            label = "Dietary Restrictions",
-            value = dietaryRestrictions,
-            modifier = Modifier.fillMaxWidth()
-        )
+            DetailTextField(
+                label = "Dietary Restrictions",
+                value = dietaryRestrictions,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
-        DetailTextField(
-            label = "Food Allergies",
-            value = foodAllergies,
-            modifier = Modifier.fillMaxWidth()
-        )
+            DetailTextField(
+                label = "Food Allergies",
+                value = foodAllergies,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
-        DetailTextField(
-            label = "Ingredients",
-            value = ingredients,
-            modifier = Modifier.fillMaxWidth()
+            DetailTextField(
+                label = "Ingredients",
+                value = ingredients,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Row(horizontalArrangement = Arrangement.Center) {
-            Button(
-                modifier = Modifier.padding(start = 15.dp),
-                onClick = {
-                    ingredientItems.add(ingredients.value)
-                    ingredients.value = ""
-                }) {
-                Text(text = "Add Ingredient")
-            }
-
-            Spacer(modifier = Modifier.weight(.5f))
+            Spacer(modifier = Modifier.height(10.dp))
 
             Button(
                 modifier = Modifier.padding(end = 15.dp),
                 onClick = {
                     scope.launch {
+                        val query =
+                            "Generate a recipe for $mealName that serves ${partySize.value} " +
+                                    "using the following ingredients: ${ingredients.value}. " +
+                                    "Keep in mind the following " +
+                                    "dietary restrictions: ${dietaryRestrictions.value}. " +
+                                    "Also note that I am allergic to ${foodAllergies.value}."
                         pagerState.animateScrollToPage(1)
                     }
                 }) {
                 Text("Generate Recipe")
             }
         }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        LazyVerticalGrid(
-            modifier = Modifier.padding(start = 85.dp),
-            horizontalArrangement = Arrangement.Center,
-            columns = GridCells.Fixed(2), content = {
-                items(ingredientItems.size) { index ->
-                    val item = ingredientItems[index]
-                    Text(
-                        text = item, modifier = Modifier
-                            .padding(25.dp)
-                            .combinedClickable(
-                                onClick = {},
-                                onLongClick = {
-                                    ingredientItems.remove(item)
-                                }
-                            )
-                    )
-                }
-            })
     }
 }
 
