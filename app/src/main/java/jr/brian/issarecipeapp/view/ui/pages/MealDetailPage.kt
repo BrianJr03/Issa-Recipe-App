@@ -1,9 +1,9 @@
 package jr.brian.issarecipeapp.view.ui.pages
 
 import android.content.Context
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -57,14 +57,21 @@ import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import jr.brian.issarecipeapp.R
+import jr.brian.issarecipeapp.model.local.Recipe
+import jr.brian.issarecipeapp.model.local.RecipeDao
+import jr.brian.issarecipeapp.util.MealType
+import jr.brian.issarecipeapp.util.ifBlankUse
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
+import jr.brian.issarecipeapp.view.ui.theme.Crimson
 import jr.brian.issarecipeapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
 fun MealDetailPage(
+    dao: RecipeDao,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
@@ -110,7 +117,6 @@ fun MealDetailPage(
         }
     }
 
-
     Scaffold() {
         Column(
             modifier = Modifier
@@ -122,8 +128,6 @@ fun MealDetailPage(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(15.dp))
-
-
 
             HorizontalPager(
                 count = 2,
@@ -151,12 +155,14 @@ fun MealDetailPage(
 
                         1 -> {
                             RecipeResults(
+                                dao = dao,
                                 generatedRecipe = generatedRecipe,
                                 pagerState = pagerState,
                                 scope = scope
                             )
                         }
                     }
+
                     Spacer(modifier = Modifier.width(20.dp))
                 }
             }
@@ -197,17 +203,6 @@ fun MealDetails(
         mutableStateOf(false)
     }
 
-    val mealTypeExamples =
-        listOf(
-            "breakfast",
-            "Thanksgiving",
-            "lunch",
-            "Valentines day",
-            "brunch",
-            "dinner",
-            "dessert"
-        )
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
@@ -215,14 +210,14 @@ fun MealDetails(
     ) {
         items(1) {
             DetailTextField(
-                label = "Meal Type | ex: '${mealTypeExamples.random()}'",
+                label = "Meal Type | ex: '${MealType.randomMealType}'",
                 value = mealType,
                 modifier = Modifier
                     .fillMaxWidth()
             )
 
             DetailTextField(
-                label = "Party Size",
+                label = "Party Size *",
                 value = partySize,
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -245,7 +240,7 @@ fun MealDetails(
             )
 
             DetailTextField(
-                label = "Ingredients",
+                label = "Ingredients *",
                 value = ingredients,
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -260,6 +255,9 @@ fun MealDetails(
                     } else if (ingredients.value.isBlank()) {
                         showErrorColorIngredients.value = true
                     } else if (!loading.value) {
+                        mealType.value = mealType.value.ifBlankUse("any occasion")
+                        dietaryRestrictions.value = dietaryRestrictions.value.ifBlankUse("none")
+                        foodAllergies.value = foodAllergies.value.ifBlankUse("none")
                         val query =
                             "Generate a recipe for ${mealType.value} that serves ${partySize.value} " +
                                     "using the following ingredients: ${ingredients.value}. " +
@@ -290,66 +288,90 @@ fun MealDetails(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RecipeResults(
+    dao: RecipeDao,
     generatedRecipe: MutableState<String>,
     pagerState: PagerState,
     scope: CoroutineScope
 ) {
-    val context = LocalContext.current
+    val isShowingSaveCheck = remember {
+        mutableStateOf(false)
+    }
 
     val copyColor = BlueIsh
     val customTextSelectionColors = TextSelectionColors(
         handleColor = copyColor,
         backgroundColor = copyColor
     )
-    LazyColumn(
+
+    Column(
         modifier = Modifier
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(1) {
-            CompositionLocalProvider(
-                LocalTextSelectionColors provides customTextSelectionColors
-            ) {
-                SelectionContainer {
-                    Text(
-                        generatedRecipe.value,
-                        modifier = Modifier.padding(15.dp)
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Button(onClick = {
+                scope.launch {
+                    pagerState.animateScrollToPage(0)
+                }
+            }) {
+                Text("Back")
+            }
+
+            if (generatedRecipe.value.isNotBlank()) {
+                Spacer(modifier = Modifier.width(50.dp))
+                IconButton(onClick = {
+                    dao.insertRecipe(Recipe(generatedRecipe.value))
+                    isShowingSaveCheck.value = true
+                    scope.launch {
+                        delay(1000)
+                        isShowingSaveCheck.value = false
+                    }
+                }) {
+                    Icon(
+                        tint = Crimson,
+                        modifier = Modifier.size(50.dp),
+                        painter = painterResource(id = R.drawable.baseline_favorite_24),
+                        contentDescription = "Favorite this recipe"
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            if (generatedRecipe.value.isBlank()) {
-                Text("No Generated Recipe", fontSize = 20.sp)
-                Spacer(modifier = Modifier.height(20.dp))
+            AnimatedVisibility(visible = isShowingSaveCheck.value) {
+                Text(
+                    text = "Saved!",
+                    fontSize = 16.sp,
+                    color = BlueIsh,
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                )
             }
+        }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Button(onClick = {
-                    scope.launch {
-                        pagerState.animateScrollToPage(0)
-                    }
-                }) {
-                    Text("Back")
-                }
+        Spacer(modifier = Modifier.width(10.dp))
 
-                if (generatedRecipe.value.isNotBlank()) {
-                    Spacer(modifier = Modifier.width(50.dp))
-                    IconButton(onClick = {
-                        Toast.makeText(context, "Coming Soon", Toast.LENGTH_SHORT).show()
-                    }) {
-                        Icon(
-                            tint = BlueIsh,
-                            modifier = Modifier.size(50.dp),
-                            painter = painterResource(id = R.drawable.baseline_favorite_24),
-                            contentDescription = "Favorite this recipe"
+        LazyColumn {
+            items(1) {
+                CompositionLocalProvider(
+                    LocalTextSelectionColors provides customTextSelectionColors
+                ) {
+                    SelectionContainer {
+                        Text(
+                            generatedRecipe.value,
+                            modifier = Modifier.padding(15.dp)
                         )
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(20.dp))
+
+                if (generatedRecipe.value.isBlank()) {
+                    Text("No Generated Recipe", fontSize = 20.sp)
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+            }
         }
     }
 }

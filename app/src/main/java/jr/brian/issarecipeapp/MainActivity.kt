@@ -14,14 +14,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.util.HOME_ROUTE
 import jr.brian.issarecipeapp.util.MEAL_DETAILS_ROUTE
 import jr.brian.issarecipeapp.view.ui.pages.HomePage
 import jr.brian.issarecipeapp.view.ui.pages.MealDetailPage
 import jr.brian.issarecipeapp.view.ui.theme.IssaRecipeAppTheme
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    var dao: RecipeDao? = null
+        @Inject set
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +35,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AppUI()
+                    dao?.let { AppUI(it) }
                 }
             }
         }
@@ -39,7 +43,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppUI() {
+fun AppUI(dao: RecipeDao) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = HOME_ROUTE, builder = {
         composable(HOME_ROUTE, content = {
@@ -53,7 +57,7 @@ fun AppUI() {
             MEAL_DETAILS_ROUTE,
             content = {
 
-                MealDetailPage()
+                MealDetailPage(dao = dao)
 
             })
     })
