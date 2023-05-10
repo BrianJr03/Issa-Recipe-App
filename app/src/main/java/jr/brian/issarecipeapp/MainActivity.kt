@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import dagger.hilt.android.AndroidEntryPoint
 import jr.brian.issarecipeapp.model.local.PresetMealNatType
 import jr.brian.issarecipeapp.util.HOME_ROUTE
 import jr.brian.issarecipeapp.util.MEAL_DETAILS_ROUTE
@@ -21,6 +22,7 @@ import jr.brian.issarecipeapp.view.ui.pages.HomePage
 import jr.brian.issarecipeapp.view.ui.pages.MealDetailPage
 import jr.brian.issarecipeapp.view.ui.theme.IssaRecipeAppTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {

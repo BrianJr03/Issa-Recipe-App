@@ -13,7 +13,7 @@ data class PresetMeal(
 ) : Parcelable
 
 val presetMeals = listOf(
-    PresetMeal("BreakFast", ""),
+    PresetMeal("Breakfast", ""),
     PresetMeal("Brunch", ""),
     PresetMeal("Lunch", ""),
     PresetMeal("Snack", ""),
