@@ -61,6 +61,7 @@ import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.util.MealType
 import jr.brian.issarecipeapp.util.ifBlankUse
+import jr.brian.issarecipeapp.view.ui.components.ShowNameRecipeDialog
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import jr.brian.issarecipeapp.view.ui.theme.Crimson
 import jr.brian.issarecipeapp.viewmodel.MainViewModel
@@ -84,6 +85,10 @@ fun MealDetailPage(
 
     val generatedRecipe = remember {
         mutableStateOf("")
+    }
+
+    val hasBeenSaved = remember {
+        mutableStateOf(false)
     }
 
     val context = LocalContext.current
@@ -146,6 +151,7 @@ fun MealDetailPage(
                                 foodAllergies = foodAllergies,
                                 ingredients = ingredients,
                                 generatedRecipe = generatedRecipe,
+                                hasBeenSaved = hasBeenSaved,
                                 pagerState = pagerState,
                                 scope = scope,
                                 context = context,
@@ -157,6 +163,7 @@ fun MealDetailPage(
                             RecipeResults(
                                 dao = dao,
                                 generatedRecipe = generatedRecipe,
+                                hasBeenSaved = hasBeenSaved,
                                 pagerState = pagerState,
                                 scope = scope
                             )
@@ -188,6 +195,7 @@ fun MealDetails(
     foodAllergies: MutableState<String>,
     ingredients: MutableState<String>,
     generatedRecipe: MutableState<String>,
+    hasBeenSaved: MutableState<Boolean>,
     pagerState: PagerState,
     scope: CoroutineScope,
     context: Context,
@@ -221,7 +229,7 @@ fun MealDetails(
                 value = partySize,
                 modifier = Modifier
                     .fillMaxWidth(),
-                showErrorColor = showErrorColorPartySize
+                isShowingErrorColor = showErrorColorPartySize
             )
 
             DetailTextField(
@@ -244,7 +252,7 @@ fun MealDetails(
                 value = ingredients,
                 modifier = Modifier
                     .fillMaxWidth(),
-                showErrorColor = showErrorColorIngredients
+                isShowingErrorColor = showErrorColorIngredients
             )
 
             Button(
@@ -269,6 +277,7 @@ fun MealDetails(
                             generatedRecipe.value = viewModel.response.value ?: ""
                             pagerState.animateScrollToPage(1)
                         }
+                        hasBeenSaved.value = false
                     }
                 }) {
 
@@ -290,10 +299,11 @@ fun MealDetails(
 fun RecipeResults(
     dao: RecipeDao,
     generatedRecipe: MutableState<String>,
+    hasBeenSaved: MutableState<Boolean>,
     pagerState: PagerState,
     scope: CoroutineScope
 ) {
-    val isShowingSaveCheck = remember {
+    val isShowingSavedSuccess = remember {
         mutableStateOf(false)
     }
 
@@ -302,6 +312,38 @@ fun RecipeResults(
         handleColor = copyColor,
         backgroundColor = copyColor
     )
+
+    val isShowingSaveNameDialog = remember {
+        mutableStateOf(false)
+    }
+
+    val isShowingSaveNameError = remember {
+        mutableStateOf(false)
+    }
+
+    val name = remember {
+        mutableStateOf("")
+    }
+
+    ShowNameRecipeDialog(
+        isShowing = isShowingSaveNameDialog,
+        name = name,
+        isShowingErrorColor = isShowingSaveNameError
+    ) {
+        if (name.value.isNotBlank()) {
+            dao.insertRecipe(Recipe(generatedRecipe.value, name.value))
+            isShowingSavedSuccess.value = true
+            isShowingSaveNameDialog.value = false
+            name.value = ""
+            scope.launch {
+                delay(1000)
+                isShowingSavedSuccess.value = false
+                hasBeenSaved.value = true
+            }
+        } else {
+            isShowingSaveNameError.value = true
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -318,15 +360,10 @@ fun RecipeResults(
                 Text("Back")
             }
 
-            if (generatedRecipe.value.isNotBlank()) {
+            if (generatedRecipe.value.isNotBlank() && !hasBeenSaved.value) {
                 Spacer(modifier = Modifier.width(50.dp))
                 IconButton(onClick = {
-                    dao.insertRecipe(Recipe(generatedRecipe.value))
-                    isShowingSaveCheck.value = true
-                    scope.launch {
-                        delay(1000)
-                        isShowingSaveCheck.value = false
-                    }
+                    isShowingSaveNameDialog.value = !isShowingSaveNameDialog.value
                 }) {
                     Icon(
                         tint = Crimson,
@@ -337,7 +374,7 @@ fun RecipeResults(
                 }
             }
 
-            AnimatedVisibility(visible = isShowingSaveCheck.value) {
+            AnimatedVisibility(visible = isShowingSavedSuccess.value) {
                 Text(
                     text = "Saved!",
                     fontSize = 16.sp,
@@ -382,7 +419,7 @@ fun DetailTextField(
     label: String,
     value: MutableState<String>,
     modifier: Modifier = Modifier,
-    showErrorColor: MutableState<Boolean>? = null,
+    isShowingErrorColor: MutableState<Boolean>? = null,
 ) {
     OutlinedTextField(
         modifier = modifier.padding(15.dp),
@@ -390,9 +427,9 @@ fun DetailTextField(
         onValueChange = {
             value.value = it
             if (it.isNotBlank()) {
-                showErrorColor?.value = false
+                isShowingErrorColor?.value = false
             } else if (it.toIntOrNull() != null) {
-                showErrorColor?.value = false
+                isShowingErrorColor?.value = false
             }
         },
         label = {
@@ -405,8 +442,8 @@ fun DetailTextField(
             )
         },
         colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = if (showErrorColor?.value == true) Color.Red else BlueIsh,
-            unfocusedIndicatorColor = if (showErrorColor?.value == true) Color.Red
+            focusedIndicatorColor = if (isShowingErrorColor?.value == true) Color.Red else BlueIsh,
+            unfocusedIndicatorColor = if (isShowingErrorColor?.value == true) Color.Red
             else MaterialTheme.colorScheme.background
         ),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
