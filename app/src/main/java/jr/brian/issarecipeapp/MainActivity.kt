@@ -15,10 +15,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import jr.brian.issarecipeapp.model.local.RecipeDao
+import jr.brian.issarecipeapp.util.FAV_RECIPES_ROUTE
 import jr.brian.issarecipeapp.util.HOME_ROUTE
 import jr.brian.issarecipeapp.util.MEAL_DETAILS_ROUTE
+import jr.brian.issarecipeapp.view.ui.pages.FavRecipesPage
 import jr.brian.issarecipeapp.view.ui.pages.HomePage
-import jr.brian.issarecipeapp.view.ui.pages.MealDetailPage
+import jr.brian.issarecipeapp.view.ui.pages.GenerateRecipe
 import jr.brian.issarecipeapp.view.ui.theme.IssaRecipeAppTheme
 import javax.inject.Inject
 
@@ -26,6 +28,7 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     var dao: RecipeDao? = null
         @Inject set
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,18 +50,23 @@ fun AppUI(dao: RecipeDao) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = HOME_ROUTE, builder = {
         composable(HOME_ROUTE, content = {
-            HomePage {
+            HomePage(onNavToMealDetails = {
                 navController.navigate(MEAL_DETAILS_ROUTE) {
                     launchSingleTop = true
                 }
-            }
+            }, onNavToFavRecipes = {
+                navController.navigate(FAV_RECIPES_ROUTE) {
+                    launchSingleTop = true
+                }
+            })
         })
         composable(
             MEAL_DETAILS_ROUTE,
             content = {
-
-                MealDetailPage(dao = dao)
-
+                GenerateRecipe(dao = dao)
             })
+        composable(FAV_RECIPES_ROUTE, content = {
+            FavRecipesPage(dao = dao)
+        })
     })
 }

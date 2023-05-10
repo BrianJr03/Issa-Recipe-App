@@ -20,7 +20,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -60,8 +59,9 @@ import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.util.MealType
+import jr.brian.issarecipeapp.util.customTextSelectionColors
 import jr.brian.issarecipeapp.util.ifBlankUse
-import jr.brian.issarecipeapp.view.ui.components.ShowNameRecipeDialog
+import jr.brian.issarecipeapp.view.ui.components.RecipeNameDialog
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import jr.brian.issarecipeapp.view.ui.theme.Crimson
 import jr.brian.issarecipeapp.viewmodel.MainViewModel
@@ -71,7 +71,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
-fun MealDetailPage(
+fun GenerateRecipe(
     dao: RecipeDao,
     viewModel: MainViewModel = hiltViewModel()
 ) {
@@ -132,8 +132,6 @@ fun MealDetailPage(
                 },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(15.dp))
-
             HorizontalPager(
                 count = 2,
                 state = pagerState,
@@ -142,6 +140,8 @@ fun MealDetailPage(
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
+                    Spacer(modifier = Modifier.height(15.dp))
+
                     when (currentPageIndex) {
                         0 -> {
                             MealDetails(
@@ -217,14 +217,14 @@ fun MealDetails(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         items(1) {
-            DetailTextField(
+            DefaultTextField(
                 label = "Meal Type | ex: '${MealType.randomMealType}'",
                 value = mealType,
                 modifier = Modifier
                     .fillMaxWidth()
             )
 
-            DetailTextField(
+            DefaultTextField(
                 label = "Party Size *",
                 value = partySize,
                 modifier = Modifier
@@ -232,7 +232,7 @@ fun MealDetails(
                 isShowingErrorColor = showErrorColorPartySize
             )
 
-            DetailTextField(
+            DefaultTextField(
                 label = "Dietary Restrictions",
                 value = dietaryRestrictions,
                 modifier = Modifier
@@ -240,14 +240,14 @@ fun MealDetails(
 
             )
 
-            DetailTextField(
+            DefaultTextField(
                 label = "Food Allergies",
                 value = foodAllergies,
                 modifier = Modifier
                     .fillMaxWidth()
             )
 
-            DetailTextField(
+            DefaultTextField(
                 label = "Ingredients *",
                 value = ingredients,
                 modifier = Modifier
@@ -307,11 +307,6 @@ fun RecipeResults(
         mutableStateOf(false)
     }
 
-    val copyColor = BlueIsh
-    val customTextSelectionColors = TextSelectionColors(
-        handleColor = copyColor,
-        backgroundColor = copyColor
-    )
 
     val isShowingSaveNameDialog = remember {
         mutableStateOf(false)
@@ -325,7 +320,7 @@ fun RecipeResults(
         mutableStateOf("")
     }
 
-    ShowNameRecipeDialog(
+    RecipeNameDialog(
         isShowing = isShowingSaveNameDialog,
         name = name,
         isShowingErrorColor = isShowingSaveNameError
@@ -385,8 +380,6 @@ fun RecipeResults(
             }
         }
 
-        Spacer(modifier = Modifier.width(10.dp))
-
         LazyColumn {
             items(1) {
                 CompositionLocalProvider(
@@ -400,14 +393,13 @@ fun RecipeResults(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
-
                 if (generatedRecipe.value.isBlank()) {
-                    Text("No Generated Recipe", fontSize = 20.sp)
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Text(
+                        "No Generated Recipe",
+                        fontSize = 20.sp,
+                        color = BlueIsh
+                    )
                 }
-
-                Spacer(modifier = Modifier.height(20.dp))
             }
         }
     }
@@ -415,7 +407,7 @@ fun RecipeResults(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailTextField(
+fun DefaultTextField(
     label: String,
     value: MutableState<String>,
     modifier: Modifier = Modifier,
