@@ -189,6 +189,14 @@ fun MealDetails(
 ) {
     val loading = viewModel.loading.collectAsState()
 
+    val showErrorColorIngredients = remember {
+        mutableStateOf(false)
+    }
+
+    val showErrorColorPartySize = remember {
+        mutableStateOf(false)
+    }
+
     val mealTypeExamples =
         listOf(
             "breakfast",
@@ -217,8 +225,8 @@ fun MealDetails(
                 label = "Party Size",
                 value = partySize,
                 modifier = Modifier
-                    .fillMaxWidth()
-
+                    .fillMaxWidth(),
+                showErrorColor = showErrorColorPartySize
             )
 
             DetailTextField(
@@ -240,13 +248,18 @@ fun MealDetails(
                 label = "Ingredients",
                 value = ingredients,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                showErrorColor = showErrorColorIngredients
             )
 
             Button(
                 modifier = Modifier.padding(end = 15.dp),
                 onClick = {
-                    if (!loading.value) {
+                    if (partySize.value.toIntOrNull() == null) {
+                        showErrorColorPartySize.value = true
+                    } else if (ingredients.value.isBlank()) {
+                        showErrorColorIngredients.value = true
+                    } else if (!loading.value) {
                         val query =
                             "Generate a recipe for ${mealType.value} that serves ${partySize.value} " +
                                     "using the following ingredients: ${ingredients.value}. " +
@@ -346,13 +359,19 @@ fun RecipeResults(
 fun DetailTextField(
     label: String,
     value: MutableState<String>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showErrorColor: MutableState<Boolean>? = null,
 ) {
     OutlinedTextField(
         modifier = modifier.padding(15.dp),
         value = value.value,
         onValueChange = {
             value.value = it
+            if (it.isNotBlank()) {
+                showErrorColor?.value = false
+            } else if (it.toIntOrNull() != null) {
+                showErrorColor?.value = false
+            }
         },
         label = {
             Text(
@@ -364,8 +383,9 @@ fun DetailTextField(
             )
         },
         colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = BlueIsh,
-            unfocusedIndicatorColor = MaterialTheme.colorScheme.background
+            focusedIndicatorColor = if (showErrorColor?.value == true) Color.Red else BlueIsh,
+            unfocusedIndicatorColor = if (showErrorColor?.value == true) Color.Red
+            else MaterialTheme.colorScheme.background
         ),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = {}),
