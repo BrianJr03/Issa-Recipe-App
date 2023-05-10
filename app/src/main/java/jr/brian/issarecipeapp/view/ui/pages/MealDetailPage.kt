@@ -1,27 +1,39 @@
 package jr.brian.issarecipeapp.view.ui.pages
 
 import android.content.Context
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -32,16 +44,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
+import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import jr.brian.issarecipeapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -50,10 +65,11 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
 fun MealDetailPage(
-    mealName: String,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
+
+    val mealType = remember { mutableStateOf("") }
     val servingSize = remember { mutableStateOf("") }
     val dietaryRestrictions = remember { mutableStateOf("") }
     val foodAllergies = remember { mutableStateOf("") }
@@ -68,6 +84,33 @@ fun MealDetailPage(
 
     val interactionSource = remember { MutableInteractionSource() }
 
+    val pagerState = rememberPagerState()
+
+    val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    val callback = remember {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (pagerState.currentPage == 1) {
+                    scope.launch {
+                        pagerState.animateScrollToPage(0)
+                    }
+                } else {
+                    isEnabled = false
+                    backPressedDispatcher?.onBackPressed()
+                }
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        backPressedDispatcher?.addCallback(callback)
+        onDispose {
+            callback.remove()
+        }
+    }
+
+
     Scaffold() {
         Column(
             modifier = Modifier
@@ -80,7 +123,7 @@ fun MealDetailPage(
         ) {
             Spacer(modifier = Modifier.height(15.dp))
 
-            val pagerState = rememberPagerState()
+
 
             HorizontalPager(
                 count = 2,
@@ -93,7 +136,7 @@ fun MealDetailPage(
                     when (currentPageIndex) {
                         0 -> {
                             MealDetails(
-                                mealName = mealName,
+                                mealType = mealType,
                                 partySize = servingSize,
                                 dietaryRestrictions = dietaryRestrictions,
                                 foodAllergies = foodAllergies,
@@ -108,7 +151,6 @@ fun MealDetailPage(
 
                         1 -> {
                             RecipeResults(
-                                mealName = mealName,
                                 generatedRecipe = generatedRecipe,
                                 pagerState = pagerState,
                                 scope = scope
@@ -134,7 +176,7 @@ fun MealDetailPage(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MealDetails(
-    mealName: String,
+    mealType: MutableState<String>,
     partySize: MutableState<String>,
     dietaryRestrictions: MutableState<String>,
     foodAllergies: MutableState<String>,
@@ -146,54 +188,67 @@ fun MealDetails(
     viewModel: MainViewModel
 ) {
     val loading = viewModel.loading.collectAsState()
+
+    val mealTypeExamples =
+        listOf(
+            "breakfast",
+            "Thanksgiving",
+            "lunch",
+            "Valentines day",
+            "brunch",
+            "dinner",
+            "dessert"
+        )
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         items(1) {
-            Text(text = "$mealName Details")
-
-            Spacer(modifier = Modifier.height(20.dp))
+            DetailTextField(
+                label = "Meal Type | ex: '${mealTypeExamples.random()}'",
+                value = mealType,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
 
             DetailTextField(
                 label = "Party Size",
                 value = partySize,
-                modifier = Modifier.fillMaxWidth()
-            )
+                modifier = Modifier
+                    .fillMaxWidth()
 
-            Spacer(modifier = Modifier.height(15.dp))
+            )
 
             DetailTextField(
                 label = "Dietary Restrictions",
                 value = dietaryRestrictions,
-                modifier = Modifier.fillMaxWidth()
-            )
+                modifier = Modifier
+                    .fillMaxWidth()
 
-            Spacer(modifier = Modifier.height(15.dp))
+            )
 
             DetailTextField(
                 label = "Food Allergies",
                 value = foodAllergies,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
             )
-
-            Spacer(modifier = Modifier.height(15.dp))
 
             DetailTextField(
                 label = "Ingredients",
                 value = ingredients,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
             )
-
-            Spacer(modifier = Modifier.height(10.dp))
 
             Button(
                 modifier = Modifier.padding(end = 15.dp),
                 onClick = {
                     if (!loading.value) {
                         val query =
-                            "Generate a recipe for $mealName that serves ${partySize.value} " +
+                            "Generate a recipe for ${mealType.value} that serves ${partySize.value} " +
                                     "using the following ingredients: ${ingredients.value}. " +
                                     "Keep in mind the following " +
                                     "dietary restrictions: ${dietaryRestrictions.value}. " +
@@ -207,7 +262,10 @@ fun MealDetails(
                 }) {
 
                 if (loading.value) {
-                    CircularProgressIndicator(color = Color.Black)
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
                 } else {
                     Text("Generate Recipe")
                 }
@@ -219,37 +277,66 @@ fun MealDetails(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RecipeResults(
-    mealName: String,
     generatedRecipe: MutableState<String>,
     pagerState: PagerState,
     scope: CoroutineScope
 ) {
+    val context = LocalContext.current
+
+    val copyColor = BlueIsh
+    val customTextSelectionColors = TextSelectionColors(
+        handleColor = copyColor,
+        backgroundColor = copyColor
+    )
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         items(1) {
-            Text(
-                "$mealName Recipe",
-            )
+            CompositionLocalProvider(
+                LocalTextSelectionColors provides customTextSelectionColors
+            ) {
+                SelectionContainer {
+                    Text(
+                        generatedRecipe.value,
+                        modifier = Modifier.padding(15.dp)
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Text(
-                generatedRecipe.value,
-                modifier = Modifier.padding(15.dp)
-            )
-
-            Spacer(modifier = Modifier.height(50.dp))
-
-            Button(onClick = {
-                scope.launch {
-                    pagerState.animateScrollToPage(0)
-                }
-            }) {
-                Text("Back")
+            if (generatedRecipe.value.isBlank()) {
+                Text("No Generated Recipe", fontSize = 20.sp)
+                Spacer(modifier = Modifier.height(20.dp))
             }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Button(onClick = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(0)
+                    }
+                }) {
+                    Text("Back")
+                }
+
+                if (generatedRecipe.value.isNotBlank()) {
+                    Spacer(modifier = Modifier.width(50.dp))
+                    IconButton(onClick = {
+                        Toast.makeText(context, "Coming Soon", Toast.LENGTH_SHORT).show()
+                    }) {
+                        Icon(
+                            tint = BlueIsh,
+                            modifier = Modifier.size(50.dp),
+                            painter = painterResource(id = R.drawable.baseline_favorite_24),
+                            contentDescription = "Favorite this recipe"
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
@@ -271,13 +358,13 @@ fun DetailTextField(
             Text(
                 text = label,
                 style = TextStyle(
-                    color = Color.White,
+                    color = BlueIsh,
                     fontWeight = FontWeight.Bold
                 )
             )
         },
         colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = Color.White,
+            focusedIndicatorColor = BlueIsh,
             unfocusedIndicatorColor = MaterialTheme.colorScheme.background
         ),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),

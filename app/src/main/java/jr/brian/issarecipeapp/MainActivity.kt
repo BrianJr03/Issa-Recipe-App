@@ -13,9 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
-import jr.brian.issarecipeapp.model.local.PresetMealNatType
 import jr.brian.issarecipeapp.util.HOME_ROUTE
 import jr.brian.issarecipeapp.util.MEAL_DETAILS_ROUTE
 import jr.brian.issarecipeapp.view.ui.pages.HomePage
@@ -46,19 +44,17 @@ fun AppUI() {
     NavHost(navController = navController, startDestination = HOME_ROUTE, builder = {
         composable(HOME_ROUTE, content = {
             HomePage {
-                navController.navigate("$MEAL_DETAILS_ROUTE/${it.name}") {
+                navController.navigate(MEAL_DETAILS_ROUTE) {
                     launchSingleTop = true
                 }
             }
         })
         composable(
-            "$MEAL_DETAILS_ROUTE/{mealName}",
-            arguments = listOf(navArgument("mealName") { type = PresetMealNatType }),
+            MEAL_DETAILS_ROUTE,
             content = {
-                val meal = it.arguments?.getString("mealName")
-                meal?.let { m ->
-                    MealDetailPage(mealName = m)
-                }
+
+                MealDetailPage()
+
             })
     })
 }
