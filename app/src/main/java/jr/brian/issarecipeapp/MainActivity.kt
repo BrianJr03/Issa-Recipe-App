@@ -20,7 +20,7 @@ import jr.brian.issarecipeapp.util.HOME_ROUTE
 import jr.brian.issarecipeapp.util.MEAL_DETAILS_ROUTE
 import jr.brian.issarecipeapp.view.ui.pages.FavRecipesPage
 import jr.brian.issarecipeapp.view.ui.pages.HomePage
-import jr.brian.issarecipeapp.view.ui.pages.GenerateRecipe
+import jr.brian.issarecipeapp.view.ui.pages.GenerateRecipePage
 import jr.brian.issarecipeapp.view.ui.theme.IssaRecipeAppTheme
 import javax.inject.Inject
 
@@ -63,7 +63,7 @@ fun AppUI(dao: RecipeDao) {
         composable(
             MEAL_DETAILS_ROUTE,
             content = {
-                GenerateRecipe(dao = dao)
+                GenerateRecipePage(dao = dao)
             })
         composable(FAV_RECIPES_ROUTE, content = {
             FavRecipesPage(dao = dao)

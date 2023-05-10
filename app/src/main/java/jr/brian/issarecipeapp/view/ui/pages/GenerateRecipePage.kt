@@ -71,7 +71,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
-fun GenerateRecipe(
+fun GenerateRecipePage(
     dao: RecipeDao,
     viewModel: MainViewModel = hiltViewModel()
 ) {
@@ -218,7 +218,7 @@ fun MealDetails(
     ) {
         items(1) {
             DefaultTextField(
-                label = "Meal Type | ex: '${MealType.randomMealType}'",
+                label = "Meal Type | ex: ${MealType.randomMealType}",
                 value = mealType,
                 modifier = Modifier
                     .fillMaxWidth()
