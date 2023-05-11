@@ -19,7 +19,7 @@ private val infoExamples =
         "Target 50 grams of carbs.",
         "Target 2000 calories.",
         "Organic ingredients only.",
-        "List stores I can visit",
+        "List stores to visit",
         "List healthy alternatives.",
         "Respond in Spanish."
     )
