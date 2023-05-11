@@ -20,6 +20,7 @@ object Meal {
             "Target 50 grams of carbs.",
             "Target 2000 calories.",
             "Organic ingredients only.",
+            "List stores I can visit",
             "Respond in Spanish."
         )
 
