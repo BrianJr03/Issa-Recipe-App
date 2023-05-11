@@ -20,7 +20,7 @@ private val infoExamples =
         "Target 2000 calories.",
         "Organic ingredients only.",
         "List stores I can visit",
-        "Recommend healthy alternatives.",
+        "List healthy alternatives.",
         "Respond in Spanish."
     )
 
