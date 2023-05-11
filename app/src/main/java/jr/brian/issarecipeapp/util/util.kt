@@ -21,7 +21,8 @@ private val infoExamples =
         "Organic ingredients only.",
         "List stores to visit",
         "List healthy alternatives.",
-        "Respond in Spanish."
+        "Respond in Spanish.",
+        "Include only pizza recipes"
     )
 
 val randomInfo = infoExamples.random()

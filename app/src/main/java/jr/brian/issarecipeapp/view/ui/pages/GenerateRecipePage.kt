@@ -41,7 +41,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -98,7 +97,6 @@ fun GenerateRecipePage(
         mutableStateOf(false)
     }
 
-    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
     val loading = viewModel.loading.collectAsState()
@@ -299,6 +297,7 @@ fun MealDetails(
                         focusManager.clearFocus()
 
                         scope.launch {
+                            generatedRecipe.value = ""
                             viewModel.getChefGptResponse(userPrompt = query)
                             generatedRecipe.value =
                                 viewModel.response.value ?: "Empty Response. Please try again."
@@ -316,6 +315,52 @@ fun MealDetails(
                     )
                 } else {
                     Text("Generate Recipe")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Button(
+                modifier = Modifier.padding(end = 15.dp),
+                onClick = {
+                    if (!loading.value) {
+                        occasion.value = "any occasion"
+                        partySize.value = "1"
+                        dietaryRestrictions.value = "none"
+                        foodAllergies.value = "none"
+                        ingredients.value = "use random ingredients"
+                        additionalInfo.value = "provide random recipe"
+
+                        val query = generateRecipeQuery(
+                            occasion = occasion,
+                            partySize = partySize,
+                            dietaryRestrictions = dietaryRestrictions,
+                            foodAllergies = foodAllergies,
+                            ingredients = ingredients,
+                            additionalInfo = additionalInfo,
+                        )
+
+                        focusManager.clearFocus()
+
+                        scope.launch {
+                            generatedRecipe.value = ""
+                            viewModel.getChefGptResponse(userPrompt = query)
+                            generatedRecipe.value =
+                                viewModel.response.value ?: "Empty Response. Please try again."
+                            pagerState.animateScrollToPage(1)
+                        }
+
+                        hasBeenSaved.value = false
+                    }
+                }) {
+
+                if (loading.value) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                } else {
+                    Text("Random Recipe")
                 }
             }
         }
