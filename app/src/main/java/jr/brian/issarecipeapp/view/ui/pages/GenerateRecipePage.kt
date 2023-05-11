@@ -1,6 +1,5 @@
 package jr.brian.issarecipeapp.view.ui.pages
 
-import android.content.Context
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
@@ -62,12 +61,12 @@ import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.util.DIETARY_RESTRICTIONS_LABEL
 import jr.brian.issarecipeapp.util.FOOD_ALLERGY_LABEL
 import jr.brian.issarecipeapp.util.INGREDIENTS_LABEL
-import jr.brian.issarecipeapp.util.Meal
-import jr.brian.issarecipeapp.util.Meal.randomInfo
 import jr.brian.issarecipeapp.util.PARTY_SIZE_LABEL
 import jr.brian.issarecipeapp.util.customTextSelectionColors
 import jr.brian.issarecipeapp.util.generateRecipeQuery
 import jr.brian.issarecipeapp.util.ifBlankUse
+import jr.brian.issarecipeapp.util.randomInfo
+import jr.brian.issarecipeapp.util.randomMealOccasion
 import jr.brian.issarecipeapp.view.ui.components.RecipeNameDialog
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import jr.brian.issarecipeapp.view.ui.theme.Crimson
@@ -165,7 +164,6 @@ fun GenerateRecipePage(
                                 hasBeenSaved = hasBeenSaved,
                                 pagerState = pagerState,
                                 scope = scope,
-                                context = context,
                                 viewModel = viewModel,
                                 loading = loading
                             )
@@ -212,7 +210,6 @@ fun MealDetails(
     hasBeenSaved: MutableState<Boolean>,
     pagerState: PagerState,
     scope: CoroutineScope,
-    context: Context,
     viewModel: MainViewModel,
     loading: State<Boolean>
 ) {
@@ -233,7 +230,7 @@ fun MealDetails(
     ) {
         items(1) {
             DefaultTextField(
-                label = "Occasion | Ex: ${Meal.randomMealOccasion}",
+                label = "Occasion | Ex: $randomMealOccasion",
                 value = occasion,
                 modifier = Modifier
                     .fillMaxWidth()

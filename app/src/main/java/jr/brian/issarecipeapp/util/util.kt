@@ -2,32 +2,30 @@ package jr.brian.issarecipeapp.util
 
 import androidx.compose.runtime.MutableState
 
-object Meal {
-    private val occasionExamples =
-        listOf(
-            "breakfast",
-            "Thanksgiving",
-            "lunch",
-            "Valentines day",
-            "brunch",
-            "dinner",
-            "dessert"
-        )
+private val occasionExamples =
+    listOf(
+        "breakfast",
+        "Thanksgiving",
+        "lunch",
+        "Valentines day",
+        "brunch",
+        "dinner",
+        "dessert"
+    )
 
-    private val infoExamples =
-        listOf(
-            "Include a 3 day meal plan.",
-            "Target 50 grams of carbs.",
-            "Target 2000 calories.",
-            "Organic ingredients only.",
-            "List stores I can visit",
-            "Respond in Spanish."
-        )
+private val infoExamples =
+    listOf(
+        "Include a 3 day meal plan.",
+        "Target 50 grams of carbs.",
+        "Target 2000 calories.",
+        "Organic ingredients only.",
+        "List stores I can visit",
+        "Recommend healthy alternatives.",
+        "Respond in Spanish."
+    )
 
-    val randomInfo = infoExamples.random()
-
-    val randomMealOccasion = occasionExamples.random()
-}
+val randomInfo = infoExamples.random()
+val randomMealOccasion = occasionExamples.random()
 
 fun generateRecipeQuery(
     occasion: MutableState<String>,
