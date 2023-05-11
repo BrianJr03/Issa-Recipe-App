@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,8 +59,14 @@ import com.google.accompanist.pager.rememberPagerState
 import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
-import jr.brian.issarecipeapp.util.MealType
+import jr.brian.issarecipeapp.util.DIETARY_RESTRICTIONS_LABEL
+import jr.brian.issarecipeapp.util.FOOD_ALLERGY_LABEL
+import jr.brian.issarecipeapp.util.INGREDIENTS_LABEL
+import jr.brian.issarecipeapp.util.Meal
+import jr.brian.issarecipeapp.util.Meal.randomInfo
+import jr.brian.issarecipeapp.util.PARTY_SIZE_LABEL
 import jr.brian.issarecipeapp.util.customTextSelectionColors
+import jr.brian.issarecipeapp.util.generateRecipeQuery
 import jr.brian.issarecipeapp.util.ifBlankUse
 import jr.brian.issarecipeapp.view.ui.components.RecipeNameDialog
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
@@ -82,6 +89,7 @@ fun GenerateRecipePage(
     val dietaryRestrictions = remember { mutableStateOf("") }
     val foodAllergies = remember { mutableStateOf("") }
     val ingredients = remember { mutableStateOf("") }
+    val additionalInfo = remember { mutableStateOf("") }
 
     val generatedRecipe = remember {
         mutableStateOf("")
@@ -93,6 +101,8 @@ fun GenerateRecipePage(
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+
+    val loading = viewModel.loading.collectAsState()
 
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -145,17 +155,19 @@ fun GenerateRecipePage(
                     when (currentPageIndex) {
                         0 -> {
                             MealDetails(
-                                mealType = mealType,
+                                occasion = mealType,
                                 partySize = servingSize,
                                 dietaryRestrictions = dietaryRestrictions,
                                 foodAllergies = foodAllergies,
                                 ingredients = ingredients,
+                                additionalInfo = additionalInfo,
                                 generatedRecipe = generatedRecipe,
                                 hasBeenSaved = hasBeenSaved,
                                 pagerState = pagerState,
                                 scope = scope,
                                 context = context,
-                                viewModel = viewModel
+                                viewModel = viewModel,
+                                loading = loading
                             )
                         }
 
@@ -165,7 +177,8 @@ fun GenerateRecipePage(
                                 generatedRecipe = generatedRecipe,
                                 hasBeenSaved = hasBeenSaved,
                                 pagerState = pagerState,
-                                scope = scope
+                                scope = scope,
+                                loading = loading
                             )
                         }
                     }
@@ -189,19 +202,21 @@ fun GenerateRecipePage(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MealDetails(
-    mealType: MutableState<String>,
+    occasion: MutableState<String>,
     partySize: MutableState<String>,
     dietaryRestrictions: MutableState<String>,
     foodAllergies: MutableState<String>,
     ingredients: MutableState<String>,
+    additionalInfo: MutableState<String>,
     generatedRecipe: MutableState<String>,
     hasBeenSaved: MutableState<Boolean>,
     pagerState: PagerState,
     scope: CoroutineScope,
     context: Context,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    loading: State<Boolean>
 ) {
-    val loading = viewModel.loading.collectAsState()
+    val focusManager = LocalFocusManager.current
 
     val showErrorColorIngredients = remember {
         mutableStateOf(false)
@@ -218,14 +233,14 @@ fun MealDetails(
     ) {
         items(1) {
             DefaultTextField(
-                label = "Meal Type | ex: ${MealType.randomMealType}",
-                value = mealType,
+                label = "Occasion | Ex: ${Meal.randomMealOccasion}",
+                value = occasion,
                 modifier = Modifier
                     .fillMaxWidth()
             )
 
             DefaultTextField(
-                label = "Party Size *",
+                label = PARTY_SIZE_LABEL,
                 value = partySize,
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -233,7 +248,7 @@ fun MealDetails(
             )
 
             DefaultTextField(
-                label = "Dietary Restrictions",
+                label = DIETARY_RESTRICTIONS_LABEL,
                 value = dietaryRestrictions,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -241,18 +256,25 @@ fun MealDetails(
             )
 
             DefaultTextField(
-                label = "Food Allergies",
+                label = FOOD_ALLERGY_LABEL,
                 value = foodAllergies,
                 modifier = Modifier
                     .fillMaxWidth()
             )
 
             DefaultTextField(
-                label = "Ingredients *",
+                label = INGREDIENTS_LABEL,
                 value = ingredients,
                 modifier = Modifier
                     .fillMaxWidth(),
                 isShowingErrorColor = showErrorColorIngredients
+            )
+
+            DefaultTextField(
+                label = "Other Info | Ex: $randomInfo",
+                value = additionalInfo,
+                modifier = Modifier
+                    .fillMaxWidth()
             )
 
             Button(
@@ -263,20 +285,29 @@ fun MealDetails(
                     } else if (ingredients.value.isBlank()) {
                         showErrorColorIngredients.value = true
                     } else if (!loading.value) {
-                        mealType.value = mealType.value.ifBlankUse("any occasion")
-                        dietaryRestrictions.value = dietaryRestrictions.value.ifBlankUse("none")
+                        occasion.value = occasion.value.ifBlankUse("any occasion")
+                        dietaryRestrictions.value =
+                            dietaryRestrictions.value.ifBlankUse("none")
                         foodAllergies.value = foodAllergies.value.ifBlankUse("none")
-                        val query =
-                            "Generate a recipe for ${mealType.value} that serves ${partySize.value} " +
-                                    "using the following ingredients: ${ingredients.value}. " +
-                                    "Keep in mind the following " +
-                                    "dietary restrictions: ${dietaryRestrictions.value}. " +
-                                    "Also note that I am allergic to ${foodAllergies.value}."
+
+                        val query = generateRecipeQuery(
+                            occasion = occasion,
+                            partySize = partySize,
+                            dietaryRestrictions = dietaryRestrictions,
+                            foodAllergies = foodAllergies,
+                            ingredients = ingredients,
+                            additionalInfo = additionalInfo,
+                        )
+
+                        focusManager.clearFocus()
+
                         scope.launch {
-                            viewModel.getChatGptResponse(context = context, userPrompt = query)
-                            generatedRecipe.value = viewModel.response.value ?: ""
+                            viewModel.getChefGptResponse(userPrompt = query)
+                            generatedRecipe.value =
+                                viewModel.response.value ?: "Empty Response. Please try again."
                             pagerState.animateScrollToPage(1)
                         }
+
                         hasBeenSaved.value = false
                     }
                 }) {
@@ -301,7 +332,8 @@ fun RecipeResults(
     generatedRecipe: MutableState<String>,
     hasBeenSaved: MutableState<Boolean>,
     pagerState: PagerState,
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    loading: State<Boolean>
 ) {
     val isShowingSavedSuccess = remember {
         mutableStateOf(false)
@@ -333,6 +365,7 @@ fun RecipeResults(
             scope.launch {
                 delay(1000)
                 isShowingSavedSuccess.value = false
+                delay(500)
                 hasBeenSaved.value = true
             }
         } else {
@@ -352,14 +385,26 @@ fun RecipeResults(
                     pagerState.animateScrollToPage(0)
                 }
             }) {
-                Text("Back")
+                if (loading.value) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                } else {
+                    Text("Back")
+                }
             }
 
-            if (generatedRecipe.value.isNotBlank() && !hasBeenSaved.value) {
-                Spacer(modifier = Modifier.width(50.dp))
-                IconButton(onClick = {
-                    isShowingSaveNameDialog.value = !isShowingSaveNameDialog.value
-                }) {
+            AnimatedVisibility(
+                generatedRecipe.value.isNotBlank()
+                        && !hasBeenSaved.value
+                        && !loading.value
+            ) {
+                IconButton(
+                    modifier = Modifier.padding(start = 30.dp),
+                    onClick = {
+                        isShowingSaveNameDialog.value = !isShowingSaveNameDialog.value
+                    }) {
                     Icon(
                         tint = Crimson,
                         modifier = Modifier.size(50.dp),

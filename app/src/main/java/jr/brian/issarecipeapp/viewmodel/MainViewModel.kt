@@ -22,8 +22,7 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
         var textToSpeech: TextToSpeech? = null
     }
 
-    suspend fun getChatGptResponse(
-        context: Context,
+    suspend fun getChefGptResponse(
         userPrompt: String,
 
         ) {

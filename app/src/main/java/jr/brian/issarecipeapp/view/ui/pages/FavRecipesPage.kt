@@ -1,5 +1,6 @@
 package jr.brian.issarecipeapp.view.ui.pages
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
@@ -31,6 +33,8 @@ import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.view.ui.components.RecipeContentDialog
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +65,7 @@ fun FavRecipesPage(dao: RecipeDao) {
             DefaultTextField(label = "Search Recipes", value = recipeQuery)
 
             if (recipes.isEmpty()) {
-                Text("No Favorites", fontSize = 20.sp)
+                Text("No Favorites", color = BlueIsh, fontSize = 20.sp)
             } else {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
@@ -94,28 +98,41 @@ fun RecipeBox(
         mutableStateOf(false)
     }
 
+    val isToBeDeleted = remember {
+        mutableStateOf(false)
+    }
+
+    val scope = rememberCoroutineScope()
+
     RecipeContentDialog(
         dao = dao,
         recipe = recipe,
         isShowing = isShowingRecipe,
     ) {
-        favRecipes.remove(recipe)
+        scope.launch {
+            isToBeDeleted.value = true
+            delay(300)
+            isToBeDeleted.value = false
+            favRecipes.remove(recipe)
+        }
     }
 
-    Box(modifier = modifier
-        .padding(16.dp)
-        .clickable {
-            isShowingRecipe.value = !isShowingRecipe.value
-        }) {
-        Text(
-            text = recipe.name,
-            color = BlueIsh,
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            textAlign = TextAlign.Center,
-            fontSize = 20.sp
-        )
+    AnimatedVisibility(visible = !isToBeDeleted.value) {
+        Box(modifier = modifier
+            .padding(16.dp)
+            .clickable {
+                isShowingRecipe.value = !isShowingRecipe.value
+            }) {
+            Text(
+                text = recipe.name,
+                color = BlueIsh,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                textAlign = TextAlign.Center,
+                fontSize = 20.sp
+            )
+        }
     }
 }
