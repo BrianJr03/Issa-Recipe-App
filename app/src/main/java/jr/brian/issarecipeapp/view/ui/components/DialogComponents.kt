@@ -1,6 +1,5 @@
 package jr.brian.issarecipeapp.view.ui.components
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -25,7 +24,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -104,7 +102,6 @@ fun RecipeContentDialog(
     isShowing: MutableState<Boolean>,
     onDelete: () -> Unit
 ) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     val isRenameFieldShowing = remember {
@@ -115,8 +112,12 @@ fun RecipeContentDialog(
         mutableStateOf(true)
     }
 
+    val isLongPressLabelShowing = remember {
+        mutableStateOf(false)
+    }
+
     val newRecipeName = remember {
-        mutableStateOf("")
+        mutableStateOf(recipe.name)
     }
 
     val showTextFieldErrorColor = remember {
@@ -129,6 +130,14 @@ fun RecipeContentDialog(
             delay(300)
             isRenameFieldShowing.value = !isRenameFieldShowing.value
         }
+    }
+
+    val saveNewName = {
+        val newRecipe = Recipe(recipe.recipe, newRecipeName.value)
+        favRecipes[favRecipes.indexOf(recipe)] = newRecipe
+        dao.updateRecipe(recipe = newRecipe)
+        isRenameFieldShowing.value = false
+        isRenameLabelShowing.value = true
     }
 
     ShowDialog(
@@ -166,12 +175,7 @@ fun RecipeContentDialog(
                                 modifier = Modifier.padding(start = 20.dp),
                                 onClick = {
                                     if (newRecipeName.value.isNotBlank()) {
-                                        val newRecipe = Recipe(recipe.recipe, newRecipeName.value)
-                                        favRecipes[favRecipes.indexOf(recipe)] = newRecipe
-                                        dao.updateRecipe(recipe = newRecipe)
-                                        newRecipeName.value = ""
-                                        isRenameFieldShowing.value = false
-                                        isRenameLabelShowing.value = true
+                                        saveNewName()
                                     } else {
                                         showTextFieldErrorColor.value = true
                                     }
@@ -214,32 +218,45 @@ fun RecipeContentDialog(
                     .padding(10.dp)
                     .clickable {
                         isShowing.value = false
+                        if (isRenameFieldShowing.value) {
+                            saveNewName()
+                        }
                     })
         },
         dismissButton = {
-            Text(
-                "Delete",
-                fontSize = 20.sp,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .combinedClickable(
-                        onClick = {
-                            Toast
-                                .makeText(
-                                    context,
-                                    "Long-press to confirm",
-                                    Toast.LENGTH_SHORT
-                                )
-                                .show()
-                        },
-                        onLongClick = {
-                            dao.removeRecipe(recipe = recipe)
-                            scope.launch {
-                                onDelete()
-                                isShowing.value = false
-                            }
-                        })
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AnimatedVisibility(visible = isLongPressLabelShowing.value) {
+                    Text(
+                        text = "Long-Press!",
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .padding(start = 10.dp)
+                    )
+                }
+
+                Text(
+                    "Delete",
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .combinedClickable(
+                            onClick = {
+                                scope.launch {
+                                    isLongPressLabelShowing.value = true
+                                    delay(1500)
+                                    isLongPressLabelShowing.value = false
+                                }
+                            },
+                            onLongClick = {
+                                dao.removeRecipe(recipe = recipe)
+                                scope.launch {
+                                    onDelete()
+                                    isShowing.value = false
+                                }
+                            })
+                )
+            }
+
         },
         isShowing = isShowing
     )
