@@ -7,6 +7,9 @@ interface RecipeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertRecipe(recipe: Recipe)
 
+    @Update
+    fun updateRecipe(recipe: Recipe)
+
     @Query("SELECT * FROM recipes")
     fun getRecipes(): List<Recipe>
 

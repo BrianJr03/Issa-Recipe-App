@@ -50,7 +50,7 @@ fun FavRecipesPage(dao: RecipeDao) {
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
 
-    Scaffold() {
+    Scaffold {
         Spacer(modifier = Modifier.height(15.dp))
 
         Column(
@@ -107,6 +107,7 @@ fun RecipeBox(
     RecipeContentDialog(
         dao = dao,
         recipe = recipe,
+        favRecipes = favRecipes,
         isShowing = isShowingRecipe,
     ) {
         scope.launch {
