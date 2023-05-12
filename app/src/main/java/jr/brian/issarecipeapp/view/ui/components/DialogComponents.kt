@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
+import jr.brian.issarecipeapp.util.RECIPE_NAME_MAX_COUNT
 import jr.brian.issarecipeapp.util.customTextSelectionColors
 import jr.brian.issarecipeapp.view.ui.pages.DefaultTextField
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
@@ -70,7 +71,8 @@ fun RecipeNameDialog(
             DefaultTextField(
                 label = "name",
                 value = name,
-                isShowingErrorColor = isShowingErrorColor
+                isShowingErrorColor = isShowingErrorColor,
+                maxCount = RECIPE_NAME_MAX_COUNT
             )
         },
         confirmButton = {
@@ -140,6 +142,11 @@ fun RecipeContentDialog(
         isRenameLabelShowing.value = true
     }
 
+    val onLongClickDelete = {
+        dao.removeRecipe(recipe = recipe)
+        onDelete()
+    }
+
     ShowDialog(
         title = recipe.name,
         content = {
@@ -194,7 +201,8 @@ fun RecipeContentDialog(
                         DefaultTextField(
                             label = "Rename Recipe",
                             value = newRecipeName,
-                            isShowingErrorColor = showTextFieldErrorColor
+                            isShowingErrorColor = showTextFieldErrorColor,
+                            maxCount = RECIPE_NAME_MAX_COUNT
                         )
                     }
 
@@ -229,6 +237,10 @@ fun RecipeContentDialog(
                     Text(
                         text = "Long-Press to ",
                         fontSize = 16.sp,
+                        modifier = Modifier.combinedClickable(
+                            onClick = {},
+                            onLongClick = { onLongClickDelete() }
+                        )
                     )
                 }
 
@@ -245,19 +257,14 @@ fun RecipeContentDialog(
                             onClick = {
                                 scope.launch {
                                     isLongPressLabelShowing.value = true
-                                    delay(1500)
+                                    delay(3000)
                                     isLongPressLabelShowing.value = false
                                 }
                             },
-                            onLongClick = {
-                                dao.removeRecipe(recipe = recipe)
-                                scope.launch {
-                                    onDelete()
-                                }
-                            })
+                            onLongClick = { onLongClickDelete() }
+                        )
                 )
             }
-
         },
         isShowing = isShowing
     )

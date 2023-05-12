@@ -511,17 +511,20 @@ fun DefaultTextField(
     label: String,
     value: MutableState<String>,
     modifier: Modifier = Modifier,
+    maxCount: Int = Int.MAX_VALUE,
     isShowingErrorColor: MutableState<Boolean>? = null,
 ) {
     OutlinedTextField(
         modifier = modifier.padding(15.dp),
         value = value.value,
-        onValueChange = {
-            value.value = it
-            if (it.isNotBlank()) {
-                isShowingErrorColor?.value = false
-            } else if (it.toIntOrNull() != null) {
-                isShowingErrorColor?.value = false
+        onValueChange = { str ->
+            if (str.length <= maxCount) {
+                value.value = str
+                if (str.isNotBlank()) {
+                    isShowingErrorColor?.value = false
+                } else if (str.toIntOrNull() != null) {
+                    isShowingErrorColor?.value = false
+                }
             }
         },
         label = {

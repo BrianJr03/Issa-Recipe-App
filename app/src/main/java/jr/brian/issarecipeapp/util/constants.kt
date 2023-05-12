@@ -17,3 +17,5 @@ val customTextSelectionColors = TextSelectionColors(
     handleColor = BlueIsh,
     backgroundColor = BlueIsh
 )
+
+const val RECIPE_NAME_MAX_COUNT = 30
