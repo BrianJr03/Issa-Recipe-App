@@ -273,7 +273,12 @@ fun MealDetails(
             )
 
             Button(
-                modifier = Modifier.padding(end = 15.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 15.dp,
+                        end = 15.dp
+                    ),
                 onClick = {
                     if (partySize.value.toIntOrNull() == null) {
                         showErrorColorPartySize.value = true
@@ -321,7 +326,12 @@ fun MealDetails(
             Spacer(modifier = Modifier.height(10.dp))
 
             Button(
-                modifier = Modifier.padding(end = 15.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 15.dp,
+                        end = 15.dp
+                    ),
                 onClick = {
                     if (!loading.value) {
                         occasion.value = "any occasion"
@@ -339,6 +349,9 @@ fun MealDetails(
                             ingredients = ingredients,
                             additionalInfo = additionalInfo,
                         )
+
+                        showErrorColorPartySize.value = false
+                        showErrorColorIngredients.value = false
 
                         focusManager.clearFocus()
 
