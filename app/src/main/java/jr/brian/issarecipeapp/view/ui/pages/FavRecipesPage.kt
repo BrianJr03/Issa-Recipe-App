@@ -21,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -55,6 +56,14 @@ fun FavRecipesPage(dao: RecipeDao) {
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
 
+    val filteredRecipes = remember(recipeQuery, recipes) {
+        derivedStateOf {
+            recipes.filter { recipe ->
+                recipe.name.contains(recipeQuery.value, ignoreCase = true)
+            }
+        }
+    }
+
     Scaffold {
         Spacer(modifier = Modifier.height(15.dp))
 
@@ -73,7 +82,7 @@ fun FavRecipesPage(dao: RecipeDao) {
                 modifier = Modifier.padding(top = 15.dp)
             )
 
-            if (recipes.isEmpty()) {
+            if (filteredRecipes.value.isEmpty()) {
                 Text("No Favorites", color = BlueIsh, fontSize = 20.sp)
             } else {
                 LazyVerticalStaggeredGrid(
@@ -82,8 +91,8 @@ fun FavRecipesPage(dao: RecipeDao) {
                         .padding(it),
                     verticalArrangement = Arrangement.Center
                 ) {
-                    items(recipes.size) { index ->
-                        val recipe = recipes.reversed()[index]
+                    items(filteredRecipes.value.size) { index ->
+                        val recipe = filteredRecipes.value.reversed()[index]
                         RecipeBox(
                             dao = dao,
                             recipe = recipe,
@@ -95,6 +104,7 @@ fun FavRecipesPage(dao: RecipeDao) {
         }
     }
 }
+
 
 @Composable
 fun RecipeBox(
