@@ -227,10 +227,8 @@ fun RecipeContentDialog(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AnimatedVisibility(visible = isLongPressLabelShowing.value) {
                     Text(
-                        text = "Long-Press!",
+                        text = "Long-Press to ",
                         fontSize = 16.sp,
-                        modifier = Modifier
-                            .padding(start = 10.dp)
                     )
                 }
 
@@ -238,7 +236,11 @@ fun RecipeContentDialog(
                     "Delete",
                     fontSize = 20.sp,
                     modifier = Modifier
-                        .padding(10.dp)
+                        .padding(
+                            top = 10.dp,
+                            bottom = 10.dp,
+                            end = 10.dp
+                        )
                         .combinedClickable(
                             onClick = {
                                 scope.launch {
