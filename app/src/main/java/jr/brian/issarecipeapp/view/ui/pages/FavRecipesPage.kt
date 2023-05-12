@@ -116,9 +116,10 @@ fun RecipeBox(
     ) {
         scope.launch {
             isToBeDeleted.value = true
-            delay(300)
-            isToBeDeleted.value = false
             favRecipes.remove(recipe)
+            delay(500)
+            isToBeDeleted.value = false
+            isShowingRecipe.value = false
         }
     }
 

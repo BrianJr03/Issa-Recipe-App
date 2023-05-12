@@ -253,7 +253,6 @@ fun RecipeContentDialog(
                                 dao.removeRecipe(recipe = recipe)
                                 scope.launch {
                                     onDelete()
-                                    isShowing.value = false
                                 }
                             })
                 )
