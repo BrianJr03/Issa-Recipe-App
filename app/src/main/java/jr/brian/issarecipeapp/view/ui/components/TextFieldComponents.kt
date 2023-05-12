@@ -25,11 +25,15 @@ fun DefaultTextField(
     value: MutableState<String>,
     modifier: Modifier = Modifier,
     maxCount: Int = Int.MAX_VALUE,
-    trailingIcon:  @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     isShowingErrorColor: MutableState<Boolean>? = null,
 ) {
     OutlinedTextField(
-        modifier = modifier.padding(start = 15.dp, end = 15.dp, bottom = 15.dp),
+        modifier = modifier.padding(
+            start = 15.dp,
+            end = 15.dp,
+            bottom = 15.dp
+        ),
         value = value.value,
         onValueChange = { str ->
             if (str.length <= maxCount) {

@@ -67,7 +67,11 @@ fun FavRecipesPage(dao: RecipeDao) {
                     indication = null
                 ) { focusManager.clearFocus() }
         ) {
-            DefaultTextField(label = "Search Recipes", value = recipeQuery)
+            DefaultTextField(
+                label = "Search Recipes",
+                value = recipeQuery,
+                modifier = Modifier.padding(top = 15.dp)
+            )
 
             if (recipes.isEmpty()) {
                 Text("No Favorites", color = BlueIsh, fontSize = 20.sp)
