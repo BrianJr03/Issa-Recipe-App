@@ -1,17 +1,34 @@
 package jr.brian.issarecipeapp.util
 
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.runtime.MutableState
+import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 
-private val occasionExamples =
+val occasionOptions =
     listOf(
         "breakfast",
-        "Thanksgiving",
-        "lunch",
-        "Valentines day",
         "brunch",
+        "lunch",
+        "snack",
         "dinner",
         "dessert"
     )
+
+val dietaryOptions = listOf(
+    "lactose intolerance",
+    "gluten intolerance",
+    "vegetarian",
+    "vegan",
+    "kosher"
+)
+
+val allergyOptions = listOf(
+    "dairy",
+    "peanuts",
+    "fish",
+    "soy",
+    "sesame"
+)
 
 private val infoExamples =
     listOf(
@@ -26,7 +43,7 @@ private val infoExamples =
     )
 
 val randomInfo = infoExamples.random()
-val randomMealOccasion = occasionExamples.random()
+val randomMealOccasion = occasionOptions.random()
 
 fun generateRecipeQuery(
     occasion: MutableState<String>,
@@ -46,3 +63,8 @@ fun generateRecipeQuery(
                         " ${additionalInfo.value}. Thanks!"
             else ""
 }
+
+val customTextSelectionColors = TextSelectionColors(
+    handleColor = BlueIsh,
+    backgroundColor = BlueIsh
+)

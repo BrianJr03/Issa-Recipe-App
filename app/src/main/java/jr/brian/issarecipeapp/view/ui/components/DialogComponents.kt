@@ -5,11 +5,14 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.Divider
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -25,6 +28,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jr.brian.issarecipeapp.R
@@ -55,6 +59,47 @@ private fun ShowDialog(
             modifier = modifier,
         )
     }
+}
+
+@Composable
+fun PresetOptionsDialog(
+    isShowing: MutableState<Boolean>,
+    title: String,
+    options: List<String>,
+    onSelectItem: (String) -> Unit,
+) {
+    ShowDialog(
+        title = "Preset $title",
+        content = {
+            LazyColumn() {
+                items(options.size) { index ->
+                    val option = options[index]
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onSelectItem(option)
+                                isShowing.value = false
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            option,
+                            style = TextStyle(fontSize = 16.sp),
+                            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                    if (index != options.size - 1) {
+                        Divider()
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {},
+        isShowing = isShowing
+    )
 }
 
 @Composable

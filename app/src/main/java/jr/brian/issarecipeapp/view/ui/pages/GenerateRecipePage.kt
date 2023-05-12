@@ -54,12 +54,16 @@ import jr.brian.issarecipeapp.util.FOOD_ALLERGY_LABEL
 import jr.brian.issarecipeapp.util.INGREDIENTS_LABEL
 import jr.brian.issarecipeapp.util.PARTY_SIZE_LABEL
 import jr.brian.issarecipeapp.util.PARTY_SIZE_MAX_CHAR_COUNT
+import jr.brian.issarecipeapp.util.allergyOptions
 import jr.brian.issarecipeapp.util.customTextSelectionColors
+import jr.brian.issarecipeapp.util.dietaryOptions
 import jr.brian.issarecipeapp.util.generateRecipeQuery
 import jr.brian.issarecipeapp.util.ifBlankUse
+import jr.brian.issarecipeapp.util.occasionOptions
 import jr.brian.issarecipeapp.util.randomInfo
 import jr.brian.issarecipeapp.util.randomMealOccasion
 import jr.brian.issarecipeapp.view.ui.components.DefaultTextField
+import jr.brian.issarecipeapp.view.ui.components.PresetOptionsDialog
 import jr.brian.issarecipeapp.view.ui.components.RecipeNameDialog
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import jr.brian.issarecipeapp.view.ui.theme.Crimson
@@ -215,6 +219,42 @@ fun MealDetails(
         mutableStateOf(false)
     }
 
+    val isOccasionOptionsShowing = remember {
+        mutableStateOf(false)
+    }
+
+    val isDietaryOptionsShowing = remember {
+        mutableStateOf(false)
+    }
+
+    val isAllergyOptionsShowing = remember {
+        mutableStateOf(false)
+    }
+
+    PresetOptionsDialog(
+        isShowing = isOccasionOptionsShowing,
+        title = "Occasions",
+        options = occasionOptions,
+        onSelectItem = {
+            occasion.value = it
+        })
+
+    PresetOptionsDialog(
+        isShowing = isDietaryOptionsShowing,
+        title = "Restrictions",
+        options = dietaryOptions,
+        onSelectItem = {
+            dietaryRestrictions.value = it
+        })
+
+    PresetOptionsDialog(
+        isShowing = isAllergyOptionsShowing,
+        title = "Allergies",
+        options = allergyOptions,
+        onSelectItem = {
+            foodAllergies.value = it
+        })
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
@@ -249,7 +289,9 @@ fun MealDetails(
                         tint = BlueIsh,
                         contentDescription = "View preset choices",
                         modifier = Modifier.clickable {
-
+                            isDietaryOptionsShowing.value = false
+                            isAllergyOptionsShowing.value = false
+                            isOccasionOptionsShowing.value = !isOccasionOptionsShowing.value
                         }
                     )
                 }
@@ -266,7 +308,9 @@ fun MealDetails(
                         tint = BlueIsh,
                         contentDescription = "View preset choices",
                         modifier = Modifier.clickable {
-
+                            isOccasionOptionsShowing.value = false
+                            isAllergyOptionsShowing.value = false
+                            isDietaryOptionsShowing.value = !isDietaryOptionsShowing.value
                         }
                     )
                 }
@@ -284,7 +328,9 @@ fun MealDetails(
                         tint = BlueIsh,
                         contentDescription = "View preset choices",
                         modifier = Modifier.clickable {
-
+                            isDietaryOptionsShowing.value = false
+                            isOccasionOptionsShowing.value = false
+                            isAllergyOptionsShowing.value = !isAllergyOptionsShowing.value
                         }
                     )
                 }

@@ -79,7 +79,7 @@ fun FavRecipesPage(dao: RecipeDao) {
                     verticalArrangement = Arrangement.Center
                 ) {
                     items(recipes.size) { index ->
-                        val recipe = recipes[index]
+                        val recipe = recipes.reversed()[index]
                         RecipeBox(
                             dao = dao,
                             recipe = recipe,
