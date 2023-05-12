@@ -30,9 +30,8 @@ import androidx.compose.ui.unit.sp
 import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
-import jr.brian.issarecipeapp.util.RECIPE_NAME_MAX_COUNT
+import jr.brian.issarecipeapp.util.RECIPE_NAME_MAX_CHAR_COUNT
 import jr.brian.issarecipeapp.util.customTextSelectionColors
-import jr.brian.issarecipeapp.view.ui.pages.DefaultTextField
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -72,7 +71,7 @@ fun RecipeNameDialog(
                 label = "name",
                 value = name,
                 isShowingErrorColor = isShowingErrorColor,
-                maxCount = RECIPE_NAME_MAX_COUNT
+                maxCount = RECIPE_NAME_MAX_CHAR_COUNT
             )
         },
         confirmButton = {
@@ -142,7 +141,7 @@ fun RecipeContentDialog(
         isRenameLabelShowing.value = true
     }
 
-    val onLongClickDelete = {
+    val deleteOnLongClick = {
         dao.removeRecipe(recipe = recipe)
         onDelete()
     }
@@ -202,7 +201,7 @@ fun RecipeContentDialog(
                             label = "Rename Recipe",
                             value = newRecipeName,
                             isShowingErrorColor = showTextFieldErrorColor,
-                            maxCount = RECIPE_NAME_MAX_COUNT
+                            maxCount = RECIPE_NAME_MAX_CHAR_COUNT
                         )
                     }
 
@@ -239,7 +238,7 @@ fun RecipeContentDialog(
                         fontSize = 16.sp,
                         modifier = Modifier.combinedClickable(
                             onClick = {},
-                            onLongClick = { onLongClickDelete() }
+                            onLongClick = { deleteOnLongClick() }
                         )
                     )
                 }
@@ -261,7 +260,7 @@ fun RecipeContentDialog(
                                     isLongPressLabelShowing.value = false
                                 }
                             },
-                            onLongClick = { onLongClickDelete() }
+                            onLongClick = { deleteOnLongClick() }
                         )
                 )
             }

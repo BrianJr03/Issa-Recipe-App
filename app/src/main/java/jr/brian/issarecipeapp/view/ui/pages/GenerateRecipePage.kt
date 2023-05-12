@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Button
@@ -24,11 +22,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -43,9 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,11 +53,13 @@ import jr.brian.issarecipeapp.util.DIETARY_RESTRICTIONS_LABEL
 import jr.brian.issarecipeapp.util.FOOD_ALLERGY_LABEL
 import jr.brian.issarecipeapp.util.INGREDIENTS_LABEL
 import jr.brian.issarecipeapp.util.PARTY_SIZE_LABEL
+import jr.brian.issarecipeapp.util.PARTY_SIZE_MAX_CHAR_COUNT
 import jr.brian.issarecipeapp.util.customTextSelectionColors
 import jr.brian.issarecipeapp.util.generateRecipeQuery
 import jr.brian.issarecipeapp.util.ifBlankUse
 import jr.brian.issarecipeapp.util.randomInfo
 import jr.brian.issarecipeapp.util.randomMealOccasion
+import jr.brian.issarecipeapp.view.ui.components.DefaultTextField
 import jr.brian.issarecipeapp.view.ui.components.RecipeNameDialog
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import jr.brian.issarecipeapp.view.ui.theme.Crimson
@@ -129,7 +123,7 @@ fun GenerateRecipePage(
         }
     }
 
-    Scaffold() {
+    Scaffold {
         Column(
             modifier = Modifier
                 .padding(it)
@@ -228,33 +222,12 @@ fun MealDetails(
     ) {
         items(1) {
             DefaultTextField(
-                label = "Occasion | Ex: $randomMealOccasion",
-                value = occasion,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-
-            DefaultTextField(
                 label = PARTY_SIZE_LABEL,
                 value = partySize,
                 modifier = Modifier
                     .fillMaxWidth(),
+                maxCount = PARTY_SIZE_MAX_CHAR_COUNT,
                 isShowingErrorColor = showErrorColorPartySize
-            )
-
-            DefaultTextField(
-                label = DIETARY_RESTRICTIONS_LABEL,
-                value = dietaryRestrictions,
-                modifier = Modifier
-                    .fillMaxWidth()
-
-            )
-
-            DefaultTextField(
-                label = FOOD_ALLERGY_LABEL,
-                value = foodAllergies,
-                modifier = Modifier
-                    .fillMaxWidth()
             )
 
             DefaultTextField(
@@ -263,6 +236,58 @@ fun MealDetails(
                 modifier = Modifier
                     .fillMaxWidth(),
                 isShowingErrorColor = showErrorColorIngredients
+            )
+
+            DefaultTextField(
+                label = "Occasion | Ex: $randomMealOccasion",
+                value = occasion,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_menu_24),
+                        tint = BlueIsh,
+                        contentDescription = "View preset choices",
+                        modifier = Modifier.clickable {
+
+                        }
+                    )
+                }
+            )
+
+            DefaultTextField(
+                label = DIETARY_RESTRICTIONS_LABEL,
+                value = dietaryRestrictions,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_menu_24),
+                        tint = BlueIsh,
+                        contentDescription = "View preset choices",
+                        modifier = Modifier.clickable {
+
+                        }
+                    )
+                }
+
+            )
+
+            DefaultTextField(
+                label = FOOD_ALLERGY_LABEL,
+                value = foodAllergies,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_menu_24),
+                        tint = BlueIsh,
+                        contentDescription = "View preset choices",
+                        modifier = Modifier.clickable {
+
+                        }
+                    )
+                }
             )
 
             DefaultTextField(
@@ -503,45 +528,4 @@ fun RecipeResults(
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DefaultTextField(
-    label: String,
-    value: MutableState<String>,
-    modifier: Modifier = Modifier,
-    maxCount: Int = Int.MAX_VALUE,
-    isShowingErrorColor: MutableState<Boolean>? = null,
-) {
-    OutlinedTextField(
-        modifier = modifier.padding(15.dp),
-        value = value.value,
-        onValueChange = { str ->
-            if (str.length <= maxCount) {
-                value.value = str
-                if (str.isNotBlank()) {
-                    isShowingErrorColor?.value = false
-                } else if (str.toIntOrNull() != null) {
-                    isShowingErrorColor?.value = false
-                }
-            }
-        },
-        label = {
-            Text(
-                text = label,
-                style = TextStyle(
-                    color = BlueIsh,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-        },
-        colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = if (isShowingErrorColor?.value == true) Color.Red else BlueIsh,
-            unfocusedIndicatorColor = if (isShowingErrorColor?.value == true) Color.Red
-            else MaterialTheme.colorScheme.background
-        ),
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = {}),
-    )
 }
