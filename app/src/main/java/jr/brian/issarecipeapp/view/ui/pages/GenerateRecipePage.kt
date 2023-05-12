@@ -231,6 +231,14 @@ fun MealDetails(
         mutableStateOf(false)
     }
 
+    val isGenerateBtnShowing = remember {
+        mutableStateOf(true)
+    }
+
+    val isRandomBtnShowing = remember {
+        mutableStateOf(true)
+    }
+
     PresetOptionsDialog(
         isShowing = isOccasionOptionsShowing,
         title = "Occasions",
@@ -346,108 +354,122 @@ fun MealDetails(
                     .fillMaxWidth()
             )
 
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        start = 15.dp,
-                        end = 15.dp
-                    ),
-                onClick = {
-                    if (partySize.value.toIntOrNull() == null) {
-                        showErrorColorPartySize.value = true
-                    } else if (ingredients.value.isBlank()) {
-                        showErrorColorIngredients.value = true
-                    } else if (!loading.value) {
-                        occasion.value = occasion.value.ifBlankUse("any occasion")
-                        dietaryRestrictions.value =
-                            dietaryRestrictions.value.ifBlankUse("none")
-                        foodAllergies.value = foodAllergies.value.ifBlankUse("none")
+            AnimatedVisibility(visible = isGenerateBtnShowing.value) {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 15.dp,
+                            end = 15.dp
+                        ),
+                    onClick = {
+                        if (partySize.value.toIntOrNull() == null) {
+                            showErrorColorPartySize.value = true
+                        } else if (ingredients.value.isBlank()) {
+                            showErrorColorIngredients.value = true
+                        } else if (!loading.value) {
+                            scope.launch {
+                                delay(300)
+                                isRandomBtnShowing.value = false
+                            }
 
-                        val query = generateRecipeQuery(
-                            occasion = occasion,
-                            partySize = partySize,
-                            dietaryRestrictions = dietaryRestrictions,
-                            foodAllergies = foodAllergies,
-                            ingredients = ingredients,
-                            additionalInfo = additionalInfo,
-                        )
+                            occasion.value = occasion.value.ifBlankUse("any occasion")
+                            dietaryRestrictions.value =
+                                dietaryRestrictions.value.ifBlankUse("none")
+                            foodAllergies.value = foodAllergies.value.ifBlankUse("none")
 
-                        focusManager.clearFocus()
+                            val query = generateRecipeQuery(
+                                occasion = occasion,
+                                partySize = partySize,
+                                dietaryRestrictions = dietaryRestrictions,
+                                foodAllergies = foodAllergies,
+                                ingredients = ingredients,
+                                additionalInfo = additionalInfo,
+                            )
 
-                        scope.launch {
-                            generatedRecipe.value = ""
-                            viewModel.getChefGptResponse(userPrompt = query)
-                            generatedRecipe.value =
-                                viewModel.response.value ?: "Empty Response. Please try again."
-                            pagerState.animateScrollToPage(1)
+                            focusManager.clearFocus()
+
+                            scope.launch {
+                                generatedRecipe.value = ""
+                                viewModel.getChefGptResponse(userPrompt = query)
+                                generatedRecipe.value =
+                                    viewModel.response.value ?: "Empty Response. Please try again."
+                                pagerState.animateScrollToPage(1)
+                            }
+
+                            hasBeenSaved.value = false
                         }
+                    }) {
 
-                        hasBeenSaved.value = false
+                    if (loading.value) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    } else {
+                        Text("Generate Recipe")
                     }
-                }) {
-
-                if (loading.value) {
-                    CircularProgressIndicator(
-                        color = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                } else {
-                    Text("Generate Recipe")
                 }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        start = 15.dp,
-                        end = 15.dp
-                    ),
-                onClick = {
-                    if (!loading.value) {
-                        occasion.value = "any occasion"
-                        partySize.value = "1"
-                        dietaryRestrictions.value = "none"
-                        foodAllergies.value = "none"
-                        ingredients.value = "use random ingredients"
-                        additionalInfo.value = "provide random recipe"
+            AnimatedVisibility(visible = isRandomBtnShowing.value) {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 15.dp,
+                            end = 15.dp
+                        ),
+                    onClick = {
+                        if (!loading.value) {
+                            scope.launch {
+                                delay(300)
+                                isGenerateBtnShowing.value = false
+                            }
 
-                        val query = generateRecipeQuery(
-                            occasion = occasion,
-                            partySize = partySize,
-                            dietaryRestrictions = dietaryRestrictions,
-                            foodAllergies = foodAllergies,
-                            ingredients = ingredients,
-                            additionalInfo = additionalInfo,
-                        )
+                            occasion.value = "any occasion"
+                            partySize.value = "1"
+                            dietaryRestrictions.value = "none"
+                            foodAllergies.value = "none"
+                            ingredients.value = "use random ingredients"
+                            additionalInfo.value = "provide random recipe"
 
-                        showErrorColorPartySize.value = false
-                        showErrorColorIngredients.value = false
+                            val query = generateRecipeQuery(
+                                occasion = occasion,
+                                partySize = partySize,
+                                dietaryRestrictions = dietaryRestrictions,
+                                foodAllergies = foodAllergies,
+                                ingredients = ingredients,
+                                additionalInfo = additionalInfo,
+                            )
 
-                        focusManager.clearFocus()
+                            showErrorColorPartySize.value = false
+                            showErrorColorIngredients.value = false
 
-                        scope.launch {
-                            generatedRecipe.value = ""
-                            viewModel.getChefGptResponse(userPrompt = query)
-                            generatedRecipe.value =
-                                viewModel.response.value ?: "Empty Response. Please try again."
-                            pagerState.animateScrollToPage(1)
+                            focusManager.clearFocus()
+
+                            scope.launch {
+                                generatedRecipe.value = ""
+                                viewModel.getChefGptResponse(userPrompt = query)
+                                generatedRecipe.value =
+                                    viewModel.response.value ?: "Empty Response. Please try again."
+                                pagerState.animateScrollToPage(1)
+                            }
+
+                            hasBeenSaved.value = false
                         }
+                    }) {
 
-                        hasBeenSaved.value = false
+                    if (loading.value) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    } else {
+                        Text("Random Recipe")
                     }
-                }) {
-
-                if (loading.value) {
-                    CircularProgressIndicator(
-                        color = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                } else {
-                    Text("Random Recipe")
                 }
             }
         }
@@ -547,7 +569,6 @@ fun RecipeResults(
                 Text(
                     text = "Saved!",
                     fontSize = 16.sp,
-                    color = BlueIsh,
                     modifier = Modifier
                         .padding(start = 10.dp)
                 )
