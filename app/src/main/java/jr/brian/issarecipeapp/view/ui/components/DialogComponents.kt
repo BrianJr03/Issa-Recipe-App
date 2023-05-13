@@ -319,9 +319,48 @@ fun RecipeContentDialog(
 fun FolderContentDialog(
     dao: RecipeDao,
     folder: RecipeFolder,
-    folders: SnapshotStateList<RecipeFolder>,
+    recipes: SnapshotStateList<Recipe>,
     isShowing: MutableState<Boolean>,
+    onSelectItem: (Recipe) -> Unit,
     onDelete: () -> Unit
 ) {
-
+    ShowDialog(
+        title = "Recipes",
+        content = {
+            LazyColumn() {
+                items(recipes.size) { index ->
+                    val recipe = recipes.reversed()[index]
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onSelectItem(recipe)
+                                isShowing.value = false
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            recipe.name,
+                            style = TextStyle(fontSize = 16.sp),
+                            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                    if (index != recipes.size - 1) {
+                        Divider()
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                dao.removeFolder(folder)
+                onDelete()
+            }) {
+                Text(text = "Delete Test")
+            }
+        },
+        dismissButton = { /*TODO*/ },
+        isShowing = isShowing
+    )
 }

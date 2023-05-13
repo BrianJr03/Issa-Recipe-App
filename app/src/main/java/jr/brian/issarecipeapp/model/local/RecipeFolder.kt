@@ -11,18 +11,18 @@ import com.google.gson.reflect.TypeToken
 @TypeConverters(RecipeFolderTypeConverters::class)
 data class RecipeFolder(
     @PrimaryKey val name: String,
-    val recipes: List<Recipe>
+    val recipes: MutableList<Recipe>
 )
 
 class RecipeFolderTypeConverters {
     @TypeConverter
-    fun fromRecipeList(recipeList: List<Recipe>): String {
+    fun fromRecipeList(recipeList: MutableList<Recipe>): String {
         return Gson().toJson(recipeList)
     }
 
     @TypeConverter
-    fun toRecipeList(recipeJson: String): List<Recipe> {
-        val recipeType = object : TypeToken<List<Recipe>>() {}.type
+    fun toRecipeList(recipeJson: String): MutableList<Recipe> {
+        val recipeType = object : TypeToken<MutableList<Recipe>>() {}.type
         return Gson().fromJson(recipeJson, recipeType)
     }
 }
