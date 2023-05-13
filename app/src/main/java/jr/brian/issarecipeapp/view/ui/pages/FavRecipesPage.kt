@@ -1,5 +1,7 @@
 package jr.brian.issarecipeapp.view.ui.pages
 
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -21,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,10 +34,16 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.rememberPagerState
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.view.ui.components.DefaultTextField
@@ -42,9 +52,99 @@ import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalPagerApi::class
+)
 @Composable
 fun FavRecipesPage(dao: RecipeDao) {
+    val focusManager = LocalFocusManager.current
+    val interactionSource = remember { MutableInteractionSource() }
+
+    val scope = rememberCoroutineScope()
+    val pagerState = rememberPagerState()
+
+    val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    val callback = remember {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (pagerState.currentPage == 1) {
+                    scope.launch {
+                        pagerState.animateScrollToPage(0)
+                    }
+                } else {
+                    isEnabled = false
+                    backPressedDispatcher?.onBackPressed()
+                }
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        backPressedDispatcher?.addCallback(callback)
+        onDispose {
+            callback.remove()
+        }
+    }
+
+    Scaffold {
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxWidth()
+                .clickable(interactionSource = interactionSource, indication = null) {
+                    focusManager.clearFocus()
+                },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            HorizontalPager(
+                count = 2,
+                state = pagerState,
+                modifier = Modifier.weight(1f)
+            ) { currentPageIndex ->
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    when (currentPageIndex) {
+                        0 -> {
+                            RecipeGrid(
+                                dao = dao,
+                                focusManager = focusManager,
+                                interactionSource = interactionSource
+                            )
+                        }
+
+                        1 -> {
+
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(20.dp))
+                }
+            }
+
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                activeColor = BlueIsh,
+                inactiveColor = Color.Gray,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(16.dp),
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun RecipeGrid(
+    dao: RecipeDao,
+    focusManager: FocusManager,
+    interactionSource: MutableInteractionSource
+) {
     val recipes = remember {
         dao.getRecipes().toMutableStateList()
     }
@@ -52,9 +152,6 @@ fun FavRecipesPage(dao: RecipeDao) {
     val recipeQuery = remember {
         mutableStateOf("")
     }
-
-    val focusManager = LocalFocusManager.current
-    val interactionSource = remember { MutableInteractionSource() }
 
     val filteredRecipes = remember(recipeQuery, recipes) {
         derivedStateOf {
@@ -64,41 +161,35 @@ fun FavRecipesPage(dao: RecipeDao) {
         }
     }
 
-    Scaffold {
-        Spacer(modifier = Modifier.height(15.dp))
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { focusManager.clearFocus() }
+    ) {
+        DefaultTextField(
+            label = "Search Recipes",
+            value = recipeQuery,
+            modifier = Modifier.padding(top = 15.dp)
+        )
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null
-                ) { focusManager.clearFocus() }
-        ) {
-            DefaultTextField(
-                label = "Search Recipes",
-                value = recipeQuery,
-                modifier = Modifier.padding(top = 15.dp)
-            )
-
-            if (filteredRecipes.value.isEmpty()) {
-                Text("No Favorites", color = BlueIsh, fontSize = 20.sp)
-            } else {
-                LazyVerticalStaggeredGrid(
-                    columns = StaggeredGridCells.Fixed(2),
-                    modifier = Modifier
-                        .padding(it),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    items(filteredRecipes.value.size) { index ->
-                        val recipe = filteredRecipes.value.reversed()[index]
-                        RecipeBox(
-                            dao = dao,
-                            recipe = recipe,
-                            favRecipes = recipes
-                        )
-                    }
+        if (filteredRecipes.value.isEmpty()) {
+            Text("No Favorites", color = BlueIsh, fontSize = 20.sp)
+        } else {
+            LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Fixed(2),
+                verticalArrangement = Arrangement.Center
+            ) {
+                items(filteredRecipes.value.size) { index ->
+                    val recipe = filteredRecipes.value.reversed()[index]
+                    RecipeBox(
+                        dao = dao,
+                        recipe = recipe,
+                        favRecipes = recipes
+                    )
                 }
             }
         }
