@@ -11,7 +11,8 @@ val occasionOptions =
         "lunch",
         "snack",
         "dinner",
-        "dessert"
+        "dessert",
+        "any occasion"
     )
 
 val dietaryOptions = listOf(
@@ -19,7 +20,8 @@ val dietaryOptions = listOf(
     "gluten intolerance",
     "vegetarian",
     "vegan",
-    "kosher"
+    "kosher",
+    "none"
 )
 
 val allergyOptions = listOf(
@@ -27,7 +29,8 @@ val allergyOptions = listOf(
     "peanuts",
     "fish",
     "soy",
-    "sesame"
+    "sesame",
+    "none"
 )
 
 private val infoExamples =
@@ -52,17 +55,18 @@ fun generateRecipeQuery(
     foodAllergies: MutableState<String>,
     ingredients: MutableState<String>,
     additionalInfo: MutableState<String>,
-): String {
-    return "Generate a recipe for ${occasion.value} that serves ${partySize.value} " +
-            "using the following ingredients: ${ingredients.value}. " +
-            "Keep in mind the following " +
-            "dietary restrictions: ${dietaryRestrictions.value}. " +
-            "Also note that I am allergic to ${foodAllergies.value}. " +
-            if (additionalInfo.value.isNotBlank())
-                "Lastly, here is some additional info for this recipe:" +
-                        " ${additionalInfo.value}. Thanks!"
-            else ""
-}
+) = "Generate a recipe for ${occasion.value} that serves ${partySize.value} " +
+        "using the following ingredients: ${ingredients.value}. " +
+        "Keep in mind the following " +
+        "dietary restrictions: ${dietaryRestrictions.value}. " +
+        "Also note that I am allergic to ${foodAllergies.value}. " +
+        "Please include the estimated calories, fat, carbs, protein " +
+        "and preparation / cook time. " +
+        if (additionalInfo.value.isNotBlank())
+            "Lastly, here is some additional info for this recipe:" +
+                    " ${additionalInfo.value}. Thanks!"
+        else ""
+
 
 val customTextSelectionColors = TextSelectionColors(
     handleColor = BlueIsh,

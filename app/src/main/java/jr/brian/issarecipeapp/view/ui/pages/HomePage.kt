@@ -94,7 +94,7 @@ fun HomePage(
                         modifier = Modifier.clickable {
                             isMenuShowing.value = false
                             scope.launch {
-                                delay(350)
+                                delay(325)
                                 onNavToFavRecipes()
                             }
                         }
