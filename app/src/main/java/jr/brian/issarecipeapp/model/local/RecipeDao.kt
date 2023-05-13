@@ -18,4 +18,22 @@ interface RecipeDao {
 
     @Query("DELETE FROM recipes")
     fun removeAllRecipes()
+
+    // ----  FOLDERS ---- //
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertFolder(folder: RecipeFolder)
+
+    @Update
+    fun updateFolder(folder: RecipeFolder)
+
+    @Query("SELECT * FROM folders")
+    fun getFolders(): List<RecipeFolder>
+
+    @Delete
+    fun removeFolder(folder: RecipeFolder)
+
+    @Query("DELETE FROM folders")
+    fun removeAllFolders()
+
 }

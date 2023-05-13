@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
+import jr.brian.issarecipeapp.model.local.RecipeFolder
 import jr.brian.issarecipeapp.util.RECIPE_NAME_MAX_CHAR_COUNT
 import jr.brian.issarecipeapp.util.customTextSelectionColors
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
@@ -312,4 +313,15 @@ fun RecipeContentDialog(
         },
         isShowing = isShowing
     )
+}
+
+@Composable
+fun FolderContentDialog(
+    dao: RecipeDao,
+    folder: RecipeFolder,
+    folders: SnapshotStateList<RecipeFolder>,
+    isShowing: MutableState<Boolean>,
+    onDelete: () -> Unit
+) {
+
 }

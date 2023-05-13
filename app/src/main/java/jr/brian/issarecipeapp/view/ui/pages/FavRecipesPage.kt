@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,7 +47,9 @@ import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
+import jr.brian.issarecipeapp.model.local.RecipeFolder
 import jr.brian.issarecipeapp.view.ui.components.DefaultTextField
+import jr.brian.issarecipeapp.view.ui.components.FolderContentDialog
 import jr.brian.issarecipeapp.view.ui.components.RecipeContentDialog
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import kotlinx.coroutines.delay
@@ -118,7 +121,11 @@ fun FavRecipesPage(dao: RecipeDao) {
                         }
 
                         1 -> {
-
+                            FoldersGrid(
+                                dao = dao,
+                                focusManager = focusManager,
+                                interactionSource = interactionSource
+                            )
                         }
                     }
 
@@ -196,6 +203,77 @@ fun RecipeGrid(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun FoldersGrid(
+    dao: RecipeDao,
+    focusManager: FocusManager,
+    interactionSource: MutableInteractionSource
+) {
+    val folders = remember {
+        dao.getFolders().toMutableStateList()
+    }
+
+    val folderQuery = remember {
+        mutableStateOf("")
+    }
+
+    val filteredFolders = remember(folderQuery, folders) {
+        derivedStateOf {
+            folders.filter { folder ->
+                folder.name.contains(folderQuery.value, ignoreCase = true)
+            }
+        }
+    }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { focusManager.clearFocus() }
+    ) {
+        DefaultTextField(
+            label = "Search Folders",
+            value = folderQuery,
+            modifier = Modifier.padding(top = 15.dp)
+        )
+
+        Button(
+            onClick = {
+                val e = RecipeFolder("test2", listOf())
+                dao.insertFolder(e)
+                folders.add(e)
+            }
+        ) {
+            Text(text = "Create Folder")
+        }
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+        if (filteredFolders.value.isEmpty()) {
+            Text("No Folders", color = BlueIsh, fontSize = 20.sp)
+        } else {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Fixed(2),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    items(filteredFolders.value.size) { index ->
+                        val folder = filteredFolders.value.reversed()[index]
+                        FolderBox(
+                            dao = dao,
+                            folder = folder,
+                            folders = folders
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun RecipeBox(
@@ -239,6 +317,59 @@ fun RecipeBox(
             }) {
             Text(
                 text = recipe.name,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                textAlign = TextAlign.Center,
+                fontSize = 20.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun FolderBox(
+    dao: RecipeDao,
+    folder: RecipeFolder,
+    folders: SnapshotStateList<RecipeFolder>,
+    modifier: Modifier = Modifier
+) {
+    val isShowingFolder = remember {
+        mutableStateOf(false)
+    }
+
+    val isToBeDeleted = remember {
+        mutableStateOf(false)
+    }
+
+    val scope = rememberCoroutineScope()
+
+    FolderContentDialog(
+        dao = dao,
+        folder = folder,
+        folders = folders,
+        isShowing = isShowingFolder,
+    ) {
+        scope.launch {
+            isToBeDeleted.value = true
+            folders.remove(folder)
+            delay(500)
+            isToBeDeleted.value = false
+            isShowingFolder.value = false
+        }
+    }
+
+    AnimatedVisibility(visible = !isToBeDeleted.value) {
+        Box(modifier = modifier
+            .padding(16.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(BlueIsh)
+            .clickable {
+                isShowingFolder.value = !isShowingFolder.value
+            }) {
+            Text(
+                text = folder.name,
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth()
