@@ -52,6 +52,7 @@ import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.util.DIETARY_RESTRICTIONS_LABEL
 import jr.brian.issarecipeapp.util.FOOD_ALLERGY_LABEL
 import jr.brian.issarecipeapp.util.INGREDIENTS_LABEL
+import jr.brian.issarecipeapp.util.NO_GENERATED_RECIPE
 import jr.brian.issarecipeapp.util.PARTY_SIZE_LABEL
 import jr.brian.issarecipeapp.util.PARTY_SIZE_MAX_CHAR_COUNT
 import jr.brian.issarecipeapp.util.allergyOptions
@@ -490,7 +491,6 @@ fun RecipeResults(
         mutableStateOf(false)
     }
 
-
     val isShowingSaveNameDialog = remember {
         mutableStateOf(false)
     }
@@ -590,7 +590,7 @@ fun RecipeResults(
 
                 if (generatedRecipe.value.isBlank()) {
                     Text(
-                        "No Generated Recipe",
+                        NO_GENERATED_RECIPE,
                         fontSize = 20.sp,
                         color = BlueIsh
                     )
