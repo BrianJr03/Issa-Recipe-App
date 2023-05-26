@@ -15,9 +15,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import jr.brian.issarecipeapp.model.local.RecipeDao
+import jr.brian.issarecipeapp.util.EXPLORE_RECIPES_ROUTE
 import jr.brian.issarecipeapp.util.FAV_RECIPES_ROUTE
 import jr.brian.issarecipeapp.util.HOME_ROUTE
 import jr.brian.issarecipeapp.util.MEAL_DETAILS_ROUTE
+import jr.brian.issarecipeapp.view.ui.components.swipe_cards.RecipeSwipe
 import jr.brian.issarecipeapp.view.ui.pages.FavRecipesPage
 import jr.brian.issarecipeapp.view.ui.pages.HomePage
 import jr.brian.issarecipeapp.view.ui.pages.GenerateRecipePage
@@ -50,15 +52,20 @@ fun AppUI(dao: RecipeDao) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = HOME_ROUTE, builder = {
         composable(HOME_ROUTE, content = {
-            HomePage(onNavToMealDetails = {
-                navController.navigate(MEAL_DETAILS_ROUTE) {
-                    launchSingleTop = true
-                }
-            }, onNavToFavRecipes = {
-                navController.navigate(FAV_RECIPES_ROUTE) {
-                    launchSingleTop = true
-                }
-            })
+            HomePage(
+                onNavToMealDetails = {
+                    navController.navigate(MEAL_DETAILS_ROUTE) {
+                        launchSingleTop = true
+                    }
+                }, onNavToFavRecipes = {
+                    navController.navigate(FAV_RECIPES_ROUTE) {
+                        launchSingleTop = true
+                    }
+                }, onNavToExplore = {
+                    navController.navigate(EXPLORE_RECIPES_ROUTE) {
+                        launchSingleTop = true
+                    }
+                })
         })
         composable(
             MEAL_DETAILS_ROUTE,
@@ -67,6 +74,9 @@ fun AppUI(dao: RecipeDao) {
             })
         composable(FAV_RECIPES_ROUTE, content = {
             FavRecipesPage(dao = dao)
+        })
+        composable(EXPLORE_RECIPES_ROUTE, content = {
+            RecipeSwipe(dao = dao)
         })
     })
 }

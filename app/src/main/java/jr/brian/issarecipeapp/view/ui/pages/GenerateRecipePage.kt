@@ -379,12 +379,12 @@ fun MealDetails(
                             foodAllergies.value = foodAllergies.value.ifBlankUse("none")
 
                             val query = generateRecipeQuery(
-                                occasion = occasion,
-                                partySize = partySize,
-                                dietaryRestrictions = dietaryRestrictions,
-                                foodAllergies = foodAllergies,
-                                ingredients = ingredients,
-                                additionalInfo = additionalInfo,
+                                occasion = occasion.value,
+                                partySize = partySize.value,
+                                dietaryRestrictions = dietaryRestrictions.value,
+                                foodAllergies = foodAllergies.value,
+                                ingredients = ingredients.value,
+                                additionalInfo = additionalInfo.value,
                             )
 
                             focusManager.clearFocus()
@@ -437,12 +437,12 @@ fun MealDetails(
                             additionalInfo.value = "provide random recipe"
 
                             val query = generateRecipeQuery(
-                                occasion = occasion,
-                                partySize = partySize,
-                                dietaryRestrictions = dietaryRestrictions,
-                                foodAllergies = foodAllergies,
-                                ingredients = ingredients,
-                                additionalInfo = additionalInfo,
+                                occasion = occasion.value,
+                                partySize = partySize.value,
+                                dietaryRestrictions = dietaryRestrictions.value,
+                                foodAllergies = foodAllergies.value,
+                                ingredients = ingredients.value,
+                                additionalInfo = additionalInfo.value,
                             )
 
                             showErrorColorPartySize.value = false

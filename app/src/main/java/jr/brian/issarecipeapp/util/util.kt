@@ -1,7 +1,6 @@
 package jr.brian.issarecipeapp.util
 
 import androidx.compose.foundation.text.selection.TextSelectionColors
-import androidx.compose.runtime.MutableState
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 
 val occasionOptions =
@@ -49,22 +48,22 @@ val randomInfo = infoExamples.random()
 val randomMealOccasion = occasionOptions.random()
 
 fun generateRecipeQuery(
-    occasion: MutableState<String>,
-    partySize: MutableState<String>,
-    dietaryRestrictions: MutableState<String>,
-    foodAllergies: MutableState<String>,
-    ingredients: MutableState<String>,
-    additionalInfo: MutableState<String>,
-) = "Generate a recipe for ${occasion.value} that serves ${partySize.value} " +
-        "using the following ingredients: ${ingredients.value}. " +
+    occasion:String,
+    partySize: String,
+    dietaryRestrictions: String,
+    foodAllergies: String,
+    ingredients: String,
+    additionalInfo: String,
+) = "Generate a recipe for $occasion that serves $partySize " +
+        "using the following ingredients: $ingredients. " +
         "Keep in mind the following " +
-        "dietary restrictions: ${dietaryRestrictions.value}. " +
-        "Also note that I am allergic to ${foodAllergies.value}. " +
+        "dietary restrictions: $dietaryRestrictions. " +
+        "Also note that I am allergic to $foodAllergies. " +
         "Please include the estimated calories, fat, carbs, protein " +
         "and preparation / cook time. " +
-        if (additionalInfo.value.isNotBlank())
+        if (additionalInfo.isNotBlank())
             "Lastly, here is some additional info for this recipe:" +
-                    " ${additionalInfo.value}. Thanks!"
+                    " $additionalInfo. Thanks!"
         else ""
 
 

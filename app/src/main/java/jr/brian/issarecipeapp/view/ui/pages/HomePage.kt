@@ -33,7 +33,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomePage(
     onNavToMealDetails: () -> Unit,
-    onNavToFavRecipes: () -> Unit
+    onNavToFavRecipes: () -> Unit,
+    onNavToExplore: () -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -96,6 +97,21 @@ fun HomePage(
                             scope.launch {
                                 delay(325)
                                 onNavToFavRecipes()
+                            }
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(50.dp))
+
+                    Text(
+                        fontSize = 30.sp,
+                        color = BlueIsh,
+                        text = "Explore",
+                        modifier = Modifier.clickable {
+                            isMenuShowing.value = false
+                            scope.launch {
+                                delay(325)
+                                onNavToExplore()
                             }
                         }
                     )
