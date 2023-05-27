@@ -2,6 +2,7 @@ package jr.brian.issarecipeapp.util
 
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
+import java.util.Calendar
 
 val occasionOptions =
     listOf(
@@ -71,3 +72,22 @@ val customTextSelectionColors = TextSelectionColors(
     handleColor = BlueIsh,
     backgroundColor = BlueIsh
 )
+
+fun isWithinTimeRange(startHour: Int, endHour: Int): Boolean {
+    val calendar = Calendar.getInstance()
+    val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
+    return currentHour in startHour..endHour
+}
+
+val isBreakfastTime = isWithinTimeRange(breakfastStartHour, breakfastEndHour)
+val isLunchTime = isWithinTimeRange(lunchStartHour, lunchEndHour)
+
+fun getPath(): String {
+    return if (isBreakfastTime) {
+        "breakfast"
+    } else if (isLunchTime) {
+        "lunch"
+    } else {
+        "dinner"
+    }
+}

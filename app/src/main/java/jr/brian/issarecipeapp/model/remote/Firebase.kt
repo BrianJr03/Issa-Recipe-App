@@ -5,30 +5,7 @@ import jr.brian.issarecipeapp.model.local.Recipe
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import jr.brian.issarecipeapp.util.breakfastEndHour
-import jr.brian.issarecipeapp.util.breakfastStartHour
-import jr.brian.issarecipeapp.util.lunchEndHour
-import jr.brian.issarecipeapp.util.lunchStartHour
-import java.util.Calendar
-
-fun isWithinTimeRange(startHour: Int, endHour: Int): Boolean {
-    val calendar = Calendar.getInstance()
-    val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
-    return currentHour in startHour..endHour
-}
-
-val isBreakfastTime = isWithinTimeRange(breakfastStartHour, breakfastEndHour)
-val isLunchTime = isWithinTimeRange(lunchStartHour, lunchEndHour)
-
-fun getPath(): String {
-    return if (isBreakfastTime) {
-        "breakfast"
-    } else if (isLunchTime) {
-        "lunch"
-    } else {
-        "dinner"
-    }
-}
+import jr.brian.issarecipeapp.util.getPath
 
 fun retrieveRecipes(
     onSuccess: (List<Recipe>) -> Unit,
@@ -64,4 +41,3 @@ fun retrieveRecipes(
         }
     })
 }
-
