@@ -28,7 +28,7 @@ import jr.brian.issarecipeapp.view.ui.theme.sp_16
 
 @Composable
 fun RecipeCard(
-    quote: String,
+    recipe: String,
     modifier: Modifier = Modifier,
     cardPadding: PaddingValues = PaddingValues(12.dp)
 ) {
@@ -56,7 +56,7 @@ fun RecipeCard(
                     contentAlignment = Alignment.TopCenter
                 ) {
                     Text(
-                        text = quote,
+                        text = recipe,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold,
                         fontStyle = FontStyle.Italic,
@@ -72,12 +72,7 @@ fun RecipeCard(
 @Preview(showBackground = true)
 @Composable
 private fun QuoteCardPreview() {
-    Box(
-        Modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopCenter
-    ) {
-        RecipeCard(
-            "The power of water is its ability to take any shape..."
-        )
+    Box(contentAlignment = Alignment.Center) {
+        RecipeCard("Eggs")
     }
 }

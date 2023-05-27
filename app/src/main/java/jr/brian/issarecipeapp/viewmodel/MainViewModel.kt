@@ -99,7 +99,6 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
         )
     }
 
-
     private suspend fun onRecipesRetrieved() {
         _swipeLoading.emit(false)
         if (!initialized) {
