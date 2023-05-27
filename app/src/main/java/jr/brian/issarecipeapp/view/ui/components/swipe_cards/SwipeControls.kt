@@ -34,7 +34,7 @@ fun SwipeControls(width: Int, state: SwipeableState) = with(state) {
         Row(
             Modifier
                 .width(width.dp)
-                .padding(32.dp)
+                .padding(top = 25.dp, start = 25.dp, end = 25.dp, bottom = 15.dp)
                 .graphicsLayer {
                     alpha = if (isAnimationRunning || shift != 0f) 0f else 1f
                 },
@@ -73,10 +73,8 @@ fun SwipeControls(width: Int, state: SwipeableState) = with(state) {
             }
         }
     }
-
     Text(
         "You may see the same recipe more than once.",
         color = BlueIsh,
-        modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
     )
 }

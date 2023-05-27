@@ -12,7 +12,7 @@ const val DIETARY_RESTRICTIONS_LABEL = "Dietary Restrictions"
 const val FOOD_ALLERGY_LABEL = "Food Allergies"
 const val INGREDIENTS_LABEL = "Ingredients *"
 
-const val RECIPE_NAME_MAX_CHAR_COUNT = 30
+const val RECIPE_NAME_MAX_CHAR_COUNT = 40
 const val PARTY_SIZE_MAX_CHAR_COUNT = 4
 
 const val breakfastStartHour = 7
@@ -27,3 +27,5 @@ const val CONNECTION_TIMEOUT_MSG = "connection timed out. please try again."
 const val ERROR_MSG = "error"
 
 const val MAX_CARDS_IN_STACK = 7
+
+const val SWIPE_SCREEN_LABEL = "Love at first Swipe"

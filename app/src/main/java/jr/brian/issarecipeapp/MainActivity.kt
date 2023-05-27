@@ -19,7 +19,7 @@ import jr.brian.issarecipeapp.util.SWIPE_RECIPES_ROUTE
 import jr.brian.issarecipeapp.util.FAV_RECIPES_ROUTE
 import jr.brian.issarecipeapp.util.HOME_ROUTE
 import jr.brian.issarecipeapp.util.MEAL_DETAILS_ROUTE
-import jr.brian.issarecipeapp.view.ui.pages.RecipeSwipePage
+import jr.brian.issarecipeapp.view.ui.pages.RecipeSwipe
 import jr.brian.issarecipeapp.view.ui.pages.FavRecipesPage
 import jr.brian.issarecipeapp.view.ui.pages.HomePage
 import jr.brian.issarecipeapp.view.ui.pages.GenerateRecipePage
@@ -76,7 +76,7 @@ fun AppUI(dao: RecipeDao) {
             FavRecipesPage(dao = dao)
         })
         composable(SWIPE_RECIPES_ROUTE, content = {
-            RecipeSwipePage(dao = dao)
+            RecipeSwipe(dao = dao)
         })
     })
 }

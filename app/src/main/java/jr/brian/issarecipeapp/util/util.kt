@@ -1,6 +1,13 @@
 package jr.brian.issarecipeapp.util
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import java.util.Calendar
 
@@ -90,4 +97,16 @@ fun getPath(): String {
     } else {
         "dinner"
     }
+}
+
+@Composable
+fun SwipeHeaderLabel() {
+    Text(
+        SWIPE_SCREEN_LABEL,
+        Modifier.fillMaxWidth(),
+        color = BlueIsh,
+        textAlign = TextAlign.Center,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold
+    )
 }

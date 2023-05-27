@@ -34,8 +34,8 @@ fun RecipeCard(
 ) {
     Card(
         modifier = modifier
-            .fillMaxWidth(0.95f)
-            .fillMaxHeight(0.70f)
+            .fillMaxWidth(0.90f)
+            .fillMaxHeight(0.80f)
             .padding(2.dp),
         shape = RoundedCornerShape(dp_10),
         border = BorderStroke(0.5.dp, Color.Gray),

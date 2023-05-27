@@ -23,7 +23,7 @@ import jr.brian.issarecipeapp.view.ui.theme.sp_16
 import jr.brian.issarecipeapp.viewmodel.MainViewModel
 
 @Composable
-fun RecipeSwipePage(
+fun RecipeSwipe(
     dao: RecipeDao,
     viewModel: MainViewModel = hiltViewModel()
 ) {
