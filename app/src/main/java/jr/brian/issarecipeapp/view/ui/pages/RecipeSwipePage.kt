@@ -1,4 +1,4 @@
-package jr.brian.issarecipeapp.view.ui.components.swipe_cards
+package jr.brian.issarecipeapp.view.ui.pages
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,13 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.hilt.navigation.compose.hiltViewModel
 import jr.brian.issarecipeapp.model.local.RecipeDao
+import jr.brian.issarecipeapp.view.ui.components.swipe_cards.RecipeCard
+import jr.brian.issarecipeapp.view.ui.components.swipe_cards.RecipeStack
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import jr.brian.issarecipeapp.view.ui.theme.dp_20
 import jr.brian.issarecipeapp.view.ui.theme.sp_16
 import jr.brian.issarecipeapp.viewmodel.MainViewModel
 
 @Composable
-fun RecipeSwipe(
+fun RecipeSwipePage(
     dao: RecipeDao,
     viewModel: MainViewModel = hiltViewModel()
 ) {
