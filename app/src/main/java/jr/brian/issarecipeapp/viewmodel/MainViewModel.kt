@@ -12,6 +12,7 @@ import jr.brian.issarecipeapp.model.local.getRandomRecipes
 import jr.brian.issarecipeapp.model.remote.retrieveRecipes
 import jr.brian.issarecipeapp.model.repository.Repository
 import jr.brian.issarecipeapp.util.CONNECTION_TIMEOUT_MSG
+import jr.brian.issarecipeapp.util.ERROR_MSG
 import jr.brian.issarecipeapp.util.MAX_CARDS_IN_STACK
 import jr.brian.issarecipeapp.util.NO_RECIPES_TO_SWIPE_MSG
 import jr.brian.issarecipeapp.util.UP_SIDE_DOWN_FACE_EMOJI
@@ -71,13 +72,14 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
                     newSwipeRecipes.add(
                         Recipe(
                             recipe = NO_RECIPES_TO_SWIPE_MSG,
-                            name = UP_SIDE_DOWN_FACE_EMOJI // Upside down face emoji
+                            name = UP_SIDE_DOWN_FACE_EMOJI
                         )
                     )
                 } else {
                     val randomRecipes = getRandomRecipes(recipes, MAX_CARDS_IN_STACK)
                     newSwipeRecipes.addAll(randomRecipes.filter {
                         it.recipe.lowercase() != CONNECTION_TIMEOUT_MSG
+                                && it.recipe.lowercase().substring(0, 5) != ERROR_MSG
                     })
                 }
                 viewModelScope.launch {
