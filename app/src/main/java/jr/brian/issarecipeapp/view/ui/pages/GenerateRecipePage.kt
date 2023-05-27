@@ -266,9 +266,9 @@ fun MealDetails(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(1) {
+        item {
             DefaultTextField(
                 label = PARTY_SIZE_LABEL,
                 value = partySize,

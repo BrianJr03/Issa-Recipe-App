@@ -17,7 +17,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import jr.brian.issarecipeapp.view.ui.theme.dp_20
-import jr.brian.issarecipeapp.view.ui.theme.sp_14
 import jr.brian.issarecipeapp.view.ui.theme.sp_16
 import jr.brian.issarecipeapp.viewmodel.MainViewModel
 
@@ -40,11 +39,6 @@ fun RecipeSwipe(
                 "Loading Recipes!",
                 color = BlueIsh,
                 style = TextStyle(fontSize = sp_16)
-            )
-            Text(
-                "( This may take a bit to load )",
-                color = BlueIsh,
-                style = TextStyle(fontSize = sp_14)
             )
             Spacer(modifier = Modifier.height(dp_20))
             CircularProgressIndicator(color = BlueIsh)

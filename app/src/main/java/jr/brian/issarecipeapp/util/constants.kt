@@ -3,7 +3,7 @@ package jr.brian.issarecipeapp.util
 const val HOME_ROUTE = "home"
 const val MEAL_DETAILS_ROUTE = "meal-details"
 const val FAV_RECIPES_ROUTE = "fav-recipes"
-const val EXPLORE_RECIPES_ROUTE = "explore-recipes"
+const val SWIPE_RECIPES_ROUTE = "swipe-recipes"
 
 const val GPT_3_5_TURBO = "gpt-3.5-turbo"
 

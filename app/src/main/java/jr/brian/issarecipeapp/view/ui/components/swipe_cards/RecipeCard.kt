@@ -56,7 +56,7 @@ fun RecipeCard(
                     contentAlignment = Alignment.TopCenter
                 ) {
                     Text(
-                        text = "\" $quote \"",
+                        text = quote,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold,
                         fontStyle = FontStyle.Italic,

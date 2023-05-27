@@ -2,7 +2,9 @@ package jr.brian.issarecipeapp.view.ui.pages
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,12 +31,12 @@ import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomePage(
     onNavToMealDetails: () -> Unit,
     onNavToFavRecipes: () -> Unit,
-    onNavToExplore: () -> Unit
+    onNavToSwipe: () -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -64,7 +66,11 @@ fun HomePage(
             LottieRecipe(
                 isShowing = remember {
                     mutableStateOf(true)
-                }, modifier = Modifier.size(250.dp)
+                }, modifier = Modifier.size(250.dp).combinedClickable(
+                    onClick = {},
+                    onDoubleClick = {
+                    
+                })
             )
 
             AnimatedVisibility(visible = isMenuShowing.value) {
@@ -77,6 +83,21 @@ fun HomePage(
                     Text(
                         fontSize = 30.sp,
                         color = BlueIsh,
+                        text = "Swipe",
+                        modifier = Modifier.clickable {
+                            isMenuShowing.value = false
+                            scope.launch {
+                                delay(325)
+                                onNavToSwipe()
+                            }
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(25.dp))
+
+                    Text(
+                        fontSize = 30.sp,
+                        color = BlueIsh,
                         text = "Generate",
                         modifier = Modifier.clickable {
                             isMenuShowing.value = false
@@ -86,7 +107,7 @@ fun HomePage(
                             }
                         })
 
-                    Spacer(modifier = Modifier.height(50.dp))
+                    Spacer(modifier = Modifier.height(25.dp))
 
                     Text(
                         fontSize = 30.sp,
@@ -101,22 +122,7 @@ fun HomePage(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(50.dp))
-
-                    Text(
-                        fontSize = 30.sp,
-                        color = BlueIsh,
-                        text = "Explore",
-                        modifier = Modifier.clickable {
-                            isMenuShowing.value = false
-                            scope.launch {
-                                delay(325)
-                                onNavToExplore()
-                            }
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(50.dp))
+                    Spacer(modifier = Modifier.height(25.dp))
 
                     Text(
                         fontSize = 30.sp,

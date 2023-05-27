@@ -10,8 +10,9 @@ import android.speech.tts.TextToSpeech
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
 import jr.brian.issarecipeapp.model.local.Recipe
+import jr.brian.issarecipeapp.model.local.getRandomRecipes
+import jr.brian.issarecipeapp.model.remote.retrieveRecipes
 import jr.brian.issarecipeapp.model.repository.Repository
-import jr.brian.issarecipeapp.util.generateRecipeQuery
 import jr.brian.issarecipeapp.view.ui.components.swipe_cards.InfiniteList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -75,52 +76,65 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
     }
 
     val swipeRecipes = InfiniteList {
-        useNewRecipes()
-        it.clear()
-        it.addAll(currentSwipeRecipes)
+        viewModelScope.launch {
+            _swipeLoading.emit(true)
+            delay(2000)
+            _swipeLoading.emit(false)
+            useNewRecipes()
+            it.clear()
+            it.addAll(currentSwipeRecipes)
+        }
     }
 
     init {
-        refreshRecipes(10)
-    }
-
-    private fun refreshRecipes(limit: Int = 1) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                newSwipeRecipes.clear()
-
-                _swipeLoading.emit(true)
-
-                val query = generateRecipeQuery(
-                    occasion = "any",
-                    partySize = "any",
-                    dietaryRestrictions = "none", // TODO - GIVE USER OPTION TO SAVE INFO IN SETTINGS
-                    foodAllergies = "none", // TODO - GIVE USER OPTION TO SAVE INFO IN SETTINGS
-                    ingredients = "random",
-                    additionalInfo = "please provide very short recipes"
-                )
-
-                val aiResponse =  "repository.getChatGptResponse(userPrompt = query)"
-
-                for (i in 1..limit) {
-                    newSwipeRecipes.add(Recipe(aiResponse, "Recipe $i"))
-                }
-
-                _swipeLoading.emit(false)
-
-                if (!initialized) {
-                    initialized = true
-                    delay(1000)
-                    useNewRecipes()
-                    swipeRecipes.addAll(currentSwipeRecipes)
-                }
+                refreshRecipes()
             }
         }
     }
 
+    private suspend fun refreshRecipes() {
+        newSwipeRecipes.clear()
+
+        retrieveRecipes(
+            onSuccess = { recipes ->
+                val randomRecipes = getRandomRecipes(recipes, 5)
+                newSwipeRecipes.addAll(randomRecipes)
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        onRecipesRetrieved()
+                    }
+                }
+            },
+            onError = { error ->
+                newSwipeRecipes.add(
+                    Recipe(
+                        recipe = error.message,
+                        name = "${error.code}"
+                    )
+                )
+            }
+        )
+    }
+
+    private suspend fun onRecipesRetrieved() {
+        _swipeLoading.emit(false)
+        if (!initialized) {
+            initialized = true
+            useNewRecipes()
+            swipeRecipes.addAll(currentSwipeRecipes)
+        }
+    }
+
+
     private fun useNewRecipes() {
         currentSwipeRecipes.clear()
         currentSwipeRecipes.addAll(newSwipeRecipes)
-        refreshRecipes(currentSwipeRecipes.size)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                refreshRecipes()
+            }
+        }
     }
 }

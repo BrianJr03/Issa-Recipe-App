@@ -3,6 +3,7 @@ package jr.brian.issarecipeapp.view.ui.components.swipe_cards
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Favorite
@@ -28,45 +30,53 @@ fun SwipeControls(width: Int, state: SwipeableState) = with(state) {
 
     val coroutineScope = rememberCoroutineScope()
 
-    Row(
-        Modifier
-            .width(width.dp)
-            .padding(32.dp)
-            .graphicsLayer {
-                alpha = if (isAnimationRunning || shift != 0f) 0f else 1f
-            },
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Card(
-            backgroundColor = BlueIsh,
-            modifier = Modifier
-            .clip(CircleShape)
-            .clickable {
-                handleControlsAction(coroutineScope, SwipeDirection.LEFT)
-            }) {
-            Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
-                Icon(
-                    Icons.Rounded.Clear,
-                    "decline",
-                    Modifier.fillMaxSize(.5f)
-                )
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(
+            Modifier
+                .width(width.dp)
+                .padding(32.dp)
+                .graphicsLayer {
+                    alpha = if (isAnimationRunning || shift != 0f) 0f else 1f
+                },
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Card(
+                backgroundColor = BlueIsh,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable {
+                        handleControlsAction(coroutineScope, SwipeDirection.LEFT)
+                    }) {
+                Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+                    Icon(
+                        Icons.Rounded.Clear,
+                        "decline",
+                        Modifier.fillMaxSize(.5f)
+                    )
+                }
             }
-        }
-        Card(
-            backgroundColor = BlueIsh,
-            modifier = Modifier
-            .clip(CircleShape)
-            .clickable {
-                handleControlsAction(coroutineScope, SwipeDirection.RIGHT)
-            }) {
-            Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
-                Icon(
-                    Icons.Rounded.Favorite,
-                    "favorite",
-                    Modifier.fillMaxSize(.5f)
-                )
+            Card(
+                backgroundColor = BlueIsh,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable {
+                        handleControlsAction(coroutineScope, SwipeDirection.RIGHT)
+                    }) {
+                Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+                    Icon(
+                        Icons.Rounded.Favorite,
+                        "favorite",
+                        Modifier.fillMaxSize(.5f)
+                    )
+                }
             }
         }
     }
+
+    Text(
+        "You may see the same recipe more than once.",
+        color = BlueIsh,
+        modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
+    )
 }

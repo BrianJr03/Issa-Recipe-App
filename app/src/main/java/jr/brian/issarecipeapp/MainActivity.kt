@@ -15,7 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import jr.brian.issarecipeapp.model.local.RecipeDao
-import jr.brian.issarecipeapp.util.EXPLORE_RECIPES_ROUTE
+import jr.brian.issarecipeapp.util.SWIPE_RECIPES_ROUTE
 import jr.brian.issarecipeapp.util.FAV_RECIPES_ROUTE
 import jr.brian.issarecipeapp.util.HOME_ROUTE
 import jr.brian.issarecipeapp.util.MEAL_DETAILS_ROUTE
@@ -61,8 +61,8 @@ fun AppUI(dao: RecipeDao) {
                     navController.navigate(FAV_RECIPES_ROUTE) {
                         launchSingleTop = true
                     }
-                }, onNavToExplore = {
-                    navController.navigate(EXPLORE_RECIPES_ROUTE) {
+                }, onNavToSwipe = {
+                    navController.navigate(SWIPE_RECIPES_ROUTE) {
                         launchSingleTop = true
                     }
                 })
@@ -75,7 +75,7 @@ fun AppUI(dao: RecipeDao) {
         composable(FAV_RECIPES_ROUTE, content = {
             FavRecipesPage(dao = dao)
         })
-        composable(EXPLORE_RECIPES_ROUTE, content = {
+        composable(SWIPE_RECIPES_ROUTE, content = {
             RecipeSwipe(dao = dao)
         })
     })
