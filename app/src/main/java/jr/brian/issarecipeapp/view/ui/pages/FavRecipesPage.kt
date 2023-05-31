@@ -210,22 +210,12 @@ fun FoldersGrid(
     focusManager: FocusManager,
     interactionSource: MutableInteractionSource
 ) {
-    val scope = rememberCoroutineScope()
-
-    val recipes = remember {
-        dao.getRecipes().toMutableStateList()
-    }
-
     val folders = remember {
         dao.getFolders().toMutableStateList()
     }
 
     val folderQuery = remember {
         mutableStateOf("")
-    }
-
-    val isNameTakenLabelShowing = remember {
-        mutableStateOf(false)
     }
 
     val filteredFolders = remember(folderQuery, folders) {
@@ -251,35 +241,22 @@ fun FoldersGrid(
             modifier = Modifier.padding(top = 15.dp)
         )
 
-        Button(
-            onClick = {
-                val rf = RecipeFolder(folderQuery.value, mutableListOf())
-                val folderExists = folders.any { folder -> folder.name == rf.name }
-                if (folderQuery.value.isNotBlank()) {
-                    if (!folderExists) {
-                        dao.insertFolder(rf)
-                        folders.add(rf)
-                        folderQuery.value = ""
-                    } else {
-                        scope.launch {
-                            isNameTakenLabelShowing.value = true
-                            delay(1500)
-                            isNameTakenLabelShowing.value = false
+        AnimatedVisibility(visible = filteredFolders.value.isEmpty()) {
+            Button(
+                onClick = {
+                    val rf = RecipeFolder(folderQuery.value, mutableListOf())
+                    val folderExists = folders.any { folder -> folder.name == rf.name }
+                    if (folderQuery.value.isNotBlank()) {
+                        if (!folderExists) {
+                            dao.insertFolder(rf)
+                            folders.add(rf)
+                            folderQuery.value = ""
                         }
                     }
                 }
+            ) {
+                Text(text = "Create Folder")
             }
-        ) {
-            Text(text = "Create Folder")
-        }
-
-        AnimatedVisibility(visible = isNameTakenLabelShowing.value) {
-            Text(
-                "Name already taken!",
-                color = BlueIsh,
-                fontSize = 20.sp,
-                modifier = Modifier.padding(top = 10.dp)
-            )
         }
 
         Spacer(modifier = Modifier.height(15.dp))
@@ -297,7 +274,6 @@ fun FoldersGrid(
                         FolderBox(
                             dao = dao,
                             folder = folder,
-                            recipes = recipes,
                             folders = folders
                         )
                     }
@@ -364,7 +340,6 @@ fun RecipeBox(
 fun FolderBox(
     dao: RecipeDao,
     folder: RecipeFolder,
-    recipes: SnapshotStateList<Recipe>,
     folders: SnapshotStateList<RecipeFolder>,
     modifier: Modifier = Modifier
 ) {
@@ -381,7 +356,6 @@ fun FolderBox(
     FolderContentDialog(
         dao = dao,
         folder = folder,
-        recipes = recipes,
         isShowing = isShowingFolder,
         onSelectItem = {
 

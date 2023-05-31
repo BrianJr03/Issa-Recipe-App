@@ -1,6 +1,8 @@
 package jr.brian.issarecipeapp.model.local
 
 import androidx.room.*
+import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 
 @Dao
 interface RecipeDao {
@@ -36,4 +38,20 @@ interface RecipeDao {
     @Query("DELETE FROM folders")
     fun removeAllFolders()
 
+    @Query("DELETE FROM recipes WHERE folderName LIKE :folderName")
+    fun removeAllRecipesInFolder(folderName: String)
+
+    @RawQuery
+    fun getRecipeRawQuery(query: SupportSQLiteQuery): List<Recipe>
+
+    fun getRecipesByFolder(folderName: String): List<Recipe> {
+        val query = SimpleSQLiteQuery(
+            "SELECT * FROM recipes WHERE folderName LIKE ?;",
+            arrayOf(folderName)
+        )
+        return getRecipeRawQuery(query)
+    }
+
+    @Query("DELETE FROM recipes WHERE folderName LIKE :folderName")
+    fun removeAllChatsByConvo(folderName: String)
 }

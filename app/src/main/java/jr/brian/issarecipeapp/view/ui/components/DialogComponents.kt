@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -151,6 +152,10 @@ fun RecipeContentDialog(
 ) {
     val scope = rememberCoroutineScope()
 
+    val isAddFolderDialogShowing = remember {
+        mutableStateOf(false)
+    }
+
     val isRenameFieldShowing = remember {
         mutableStateOf(false)
     }
@@ -191,6 +196,8 @@ fun RecipeContentDialog(
         dao.removeRecipe(recipe = recipe)
         onDelete()
     }
+
+    FolderListDialog(isShowing = isAddFolderDialogShowing, dao = dao, recipe)
 
     ShowDialog(
         title = recipe.name,
@@ -239,6 +246,21 @@ fun RecipeContentDialog(
                                     contentDescription = "Save"
                                 )
                             }
+                        }
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        IconButton(
+                            modifier = Modifier.padding(start = 20.dp),
+                            onClick = {
+                                isAddFolderDialogShowing.value = !isAddFolderDialogShowing.value
+                            }) {
+                            Icon(
+                                painterResource(id = R.drawable.baseline_create_new_folder_24),
+                                tint = BlueIsh,
+                                modifier = Modifier.size(30.dp),
+                                contentDescription = "Save"
+                            )
                         }
                     }
 
@@ -319,11 +341,14 @@ fun RecipeContentDialog(
 fun FolderContentDialog(
     dao: RecipeDao,
     folder: RecipeFolder,
-    recipes: SnapshotStateList<Recipe>,
     isShowing: MutableState<Boolean>,
     onSelectItem: (Recipe) -> Unit,
     onDelete: () -> Unit
 ) {
+    val recipes = remember {
+        dao.getRecipesByFolder(folderName = folder.name).toMutableStateList()
+    }
+
     ShowDialog(
         title = "Recipes",
         content = {
@@ -358,6 +383,62 @@ fun FolderContentDialog(
                 onDelete()
             }) {
                 Text(text = "Delete Test")
+            }
+        },
+        dismissButton = { /*TODO*/ },
+        isShowing = isShowing
+    )
+}
+
+@Composable
+fun FolderListDialog(
+    isShowing: MutableState<Boolean>,
+    dao: RecipeDao,
+    recipe: Recipe
+) {
+    val folders = remember {
+        dao.getFolders().toMutableStateList()
+    }
+
+    ShowDialog(
+        title = "Folders",
+        content = {
+            LazyColumn() {
+                items(folders.size) { index ->
+                    val folder = folders.reversed()[index]
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                dao.updateFolder(
+                                    folder = RecipeFolder(
+                                        folder.name,
+                                        mutableListOf(recipe)
+                                    )
+                                )
+                                isShowing.value = false
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            folder.name,
+                            style = TextStyle(fontSize = 16.sp),
+                            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                    if (index != folders.size - 1) {
+                        Divider()
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+//                dao.removeFolder(folder)
+//                onDelete()
+            }) {
+                Text(text = "Ok")
             }
         },
         dismissButton = { /*TODO*/ },
