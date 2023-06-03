@@ -32,3 +32,5 @@ const val ERROR_MSG = "error"
 const val MAX_CARDS_IN_STACK = 7
 
 const val SWIPE_SCREEN_LABEL = "Love at first Swipe"
+
+const val GENERATE_API_KEY_URL = "https://platform.openai.com/account/api-keys"

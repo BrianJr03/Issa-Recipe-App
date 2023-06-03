@@ -95,7 +95,11 @@ fun AppUI(
             )
         })
         composable(MEAL_DETAILS_ROUTE, content = {
-            GenerateRecipePage(dao = dao)
+            GenerateRecipePage(dao = dao) {
+                navController.navigate(SETTINGS_ROUTE) {
+                    launchSingleTop = true
+                }
+            }
         })
         composable(FAV_RECIPES_ROUTE, content = {
             FavRecipesPage(dao = dao)

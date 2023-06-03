@@ -49,6 +49,7 @@ import com.google.accompanist.pager.rememberPagerState
 import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
+import jr.brian.issarecipeapp.model.remote.ApiService
 import jr.brian.issarecipeapp.util.DIETARY_RESTRICTIONS_LABEL
 import jr.brian.issarecipeapp.util.FOOD_ALLERGY_LABEL
 import jr.brian.issarecipeapp.util.INGREDIENTS_LABEL
@@ -76,7 +77,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun GenerateRecipePage(
     dao: RecipeDao,
-    viewModel: MainViewModel = hiltViewModel()
+    viewModel: MainViewModel = hiltViewModel(),
+    onNavToSettings: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -161,7 +163,8 @@ fun GenerateRecipePage(
                                 pagerState = pagerState,
                                 scope = scope,
                                 viewModel = viewModel,
-                                loading = loading
+                                loading = loading,
+                                onNavToSettings = onNavToSettings
                             )
                         }
 
@@ -207,7 +210,8 @@ fun MealDetails(
     pagerState: PagerState,
     scope: CoroutineScope,
     viewModel: MainViewModel,
-    loading: State<Boolean>
+    loading: State<Boolean>,
+    onNavToSettings: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -363,10 +367,12 @@ fun MealDetails(
                             end = 15.dp
                         ),
                     onClick = {
-                        if (partySize.value.toIntOrNull() == null) {
-                            showErrorColorPartySize.value = true
+                        if (ApiService.ApiKey.userApiKey.isBlank()) {
+                            onNavToSettings()
                         } else if (ingredients.value.isBlank()) {
                             showErrorColorIngredients.value = true
+                        } else if (partySize.value.toIntOrNull() == null) {
+                            showErrorColorPartySize.value = true
                         } else if (!loading.value) {
                             scope.launch {
                                 delay(300)
@@ -423,7 +429,9 @@ fun MealDetails(
                             end = 15.dp
                         ),
                     onClick = {
-                        if (!loading.value) {
+                        if (ApiService.ApiKey.userApiKey.isBlank()) {
+                            onNavToSettings()
+                        } else if (!loading.value) {
                             scope.launch {
                                 delay(300)
                                 isGenerateBtnShowing.value = false
