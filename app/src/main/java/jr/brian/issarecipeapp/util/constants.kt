@@ -4,10 +4,13 @@ const val HOME_ROUTE = "home"
 const val MEAL_DETAILS_ROUTE = "meal-details"
 const val FAV_RECIPES_ROUTE = "fav-recipes"
 const val SWIPE_RECIPES_ROUTE = "swipe-recipes"
+const val SETTINGS_ROUTE = "settings"
 
 const val GPT_3_5_TURBO = "gpt-3.5-turbo"
+const val API_KEY_LABEL = "OpenAI API Key"
 
 const val PARTY_SIZE_LABEL = "Party Size *"
+
 const val DIETARY_RESTRICTIONS_LABEL = "Dietary Restrictions"
 const val FOOD_ALLERGY_LABEL = "Food Allergies"
 const val INGREDIENTS_LABEL = "Ingredients *"

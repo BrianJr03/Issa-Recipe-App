@@ -1,6 +1,5 @@
 package jr.brian.issarecipeapp.view.ui.pages
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -21,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,9 +34,9 @@ import kotlinx.coroutines.launch
 fun HomePage(
     onNavToMealDetails: () -> Unit,
     onNavToFavRecipes: () -> Unit,
-    onNavToSwipe: () -> Unit
+    onNavToSwipe: () -> Unit,
+    onNavToSettings: () -> Unit
 ) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     val isMenuShowing = remember {
@@ -129,12 +127,11 @@ fun HomePage(
                         color = BlueIsh,
                         text = "Settings",
                         modifier = Modifier.clickable {
-                            Toast.makeText(context, "Coming Soon", Toast.LENGTH_SHORT).show()
-//                            isMenuShowing.value = false
-//                            scope.launch {
-//                                delay(350)
-//                                onNavToSettings()
-//                            }
+                            isMenuShowing.value = false
+                            scope.launch {
+                                delay(350)
+                                onNavToSettings()
+                            }
                         }
                     )
                 }

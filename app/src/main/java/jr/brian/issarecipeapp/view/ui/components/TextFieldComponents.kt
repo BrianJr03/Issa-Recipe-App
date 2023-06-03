@@ -25,6 +25,7 @@ fun DefaultTextField(
     value: MutableState<String>,
     modifier: Modifier = Modifier,
     maxCount: Int = Int.MAX_VALUE,
+    onValueChange: ((String) -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     isShowingErrorColor: MutableState<Boolean>? = null,
 ) {
@@ -44,6 +45,7 @@ fun DefaultTextField(
                     isShowingErrorColor?.value = false
                 }
             }
+            onValueChange?.invoke(value.value)
         },
         label = {
             Text(
