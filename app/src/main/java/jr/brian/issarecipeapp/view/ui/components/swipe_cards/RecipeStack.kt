@@ -6,11 +6,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import jr.brian.issarecipeapp.model.local.RecipeDao
 
 @Composable
 fun <T> RecipeStack(
     modifier: Modifier = Modifier,
+    dao: RecipeDao,
     items: InfiniteList<T>,
     onReject: (T) -> Unit = {},
     onLike: (T) -> Unit = {},
@@ -30,16 +31,9 @@ fun <T> RecipeStack(
     )
 
     items[currentPageNum+1]?.let { profile ->
-        StackBackgroundCard(modifier, swipeState) { itemContent(profile) }
+        StackBackgroundCard(modifier, dao, swipeState) { itemContent(profile) }
     }
     items[currentPageNum]?.let { profile ->
-        StackForegroundCard(modifier, swipeState) { itemContent(profile) }
+        StackForegroundCard(modifier, dao, swipeState) { itemContent(profile) }
     }
-}
-
-@Preview
-@Composable
-fun StackPreview() {
-    val items = InfiniteList(listOf("12345","23456","34567","45678"))
-    RecipeStack(items = items) { RecipeCard(it) }
 }

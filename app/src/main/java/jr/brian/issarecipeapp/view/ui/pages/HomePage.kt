@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jr.brian.issarecipeapp.R
+import jr.brian.issarecipeapp.util.HOME_NAV_DELAY
 import jr.brian.issarecipeapp.view.ui.components.LottieRecipe
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import kotlinx.coroutines.delay
@@ -85,7 +86,7 @@ fun HomePage(
                         modifier = Modifier.clickable {
                             isMenuShowing.value = false
                             scope.launch {
-                                delay(325)
+                                delay(HOME_NAV_DELAY)
                                 onNavToSwipe()
                             }
                         }
@@ -100,7 +101,7 @@ fun HomePage(
                         modifier = Modifier.clickable {
                             isMenuShowing.value = false
                             scope.launch {
-                                delay(350)
+                                delay(HOME_NAV_DELAY)
                                 onNavToMealDetails()
                             }
                         })
@@ -114,7 +115,7 @@ fun HomePage(
                         modifier = Modifier.clickable {
                             isMenuShowing.value = false
                             scope.launch {
-                                delay(325)
+                                delay(HOME_NAV_DELAY)
                                 onNavToFavRecipes()
                             }
                         }
@@ -129,7 +130,7 @@ fun HomePage(
                         modifier = Modifier.clickable {
                             isMenuShowing.value = false
                             scope.launch {
-                                delay(350)
+                                delay(HOME_NAV_DELAY)
                                 onNavToSettings()
                             }
                         }

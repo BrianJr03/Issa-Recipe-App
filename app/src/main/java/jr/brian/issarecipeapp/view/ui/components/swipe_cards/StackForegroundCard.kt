@@ -11,11 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.util.SwipeHeaderLabel
 
 @Composable
 fun StackForegroundCard(
     modifier: Modifier = Modifier,
+    dao: RecipeDao,
     state: SwipeableState,
     content: @Composable () -> Unit,
 ) {
@@ -28,7 +30,7 @@ fun StackForegroundCard(
             ) {
                 Spacer(modifier = Modifier.height(20.dp))
 
-                SwipeHeaderLabel()
+                SwipeHeaderLabel(dao)
 
                 Spacer(modifier = Modifier.height(20.dp))
 

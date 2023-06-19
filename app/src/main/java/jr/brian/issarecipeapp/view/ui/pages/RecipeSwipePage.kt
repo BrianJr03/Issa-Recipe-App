@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.hilt.navigation.compose.hiltViewModel
+import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.view.ui.components.swipe_cards.RecipeCard
 import jr.brian.issarecipeapp.view.ui.components.swipe_cards.RecipeStack
@@ -46,13 +47,26 @@ fun RecipeSwipe(
             CircularProgressIndicator(color = BlueIsh)
         }
     } else {
-        RecipeStack(items = recipes,
+        RecipeStack(
+            dao = dao,
+            items = recipes,
             onLike = {
                 dao.insertRecipe(recipe = it)
             }, onReject = {
-
+                with(RejectedRecipeCache.cache) {
+                    if (size == 7) {
+                        remove(first())
+                        add(it)
+                    } else {
+                        add(it)
+                    }
+                }
             }) { data ->
             RecipeCard(data.recipe)
         }
     }
+}
+
+object RejectedRecipeCache {
+    val cache = mutableListOf<Recipe>()
 }
