@@ -133,7 +133,7 @@ fun SwipeHeaderLabel(dao: RecipeDao) {
 
     RejectedRecipeHistoryDialog(
         isShowing = isHistoryDialogShowing,
-        recipes = RejectedRecipeCache.cache,
+        recipes = RejectedRecipeCache.cache.distinct(),
         onSelectItem = {
             isContentDialogShowing.value = true
             selectedRecipe.value = it
