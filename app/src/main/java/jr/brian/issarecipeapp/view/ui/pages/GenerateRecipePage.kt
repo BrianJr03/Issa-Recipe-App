@@ -325,7 +325,7 @@ fun MealDetails(
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_menu_24),
                         tint = BlueIsh,
-                        contentDescription = "View preset dietary options",
+                        contentDescription = "View preset dietary restrictions",
                         modifier = Modifier.clickable {
                             focusManager.clearFocus()
                             isOccasionOptionsShowing.value = false
@@ -344,7 +344,7 @@ fun MealDetails(
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_menu_24),
                         tint = BlueIsh,
-                        contentDescription = "View preset allergy options",
+                        contentDescription = "View preset food allergies",
                         modifier = Modifier.clickable {
                             focusManager.clearFocus()
                             isDietaryOptionsShowing.value = false

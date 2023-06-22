@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,15 +27,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
+import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.AppDataStore
 import jr.brian.issarecipeapp.util.API_KEY_LABEL
 import jr.brian.issarecipeapp.util.DIETARY_RESTRICTIONS_LABEL
 import jr.brian.issarecipeapp.util.FOOD_ALLERGY_LABEL
 import jr.brian.issarecipeapp.util.GENERATE_API_KEY_URL
+import jr.brian.issarecipeapp.util.allergyOptions
+import jr.brian.issarecipeapp.util.dietaryOptions
 import jr.brian.issarecipeapp.view.ui.components.DefaultTextField
+import jr.brian.issarecipeapp.view.ui.components.PresetOptionsDialog
+import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
@@ -129,10 +136,37 @@ fun Settings(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
 
     val showErrorColorAPiKey = remember {
         mutableStateOf(false)
     }
+
+    val isDietaryOptionsShowing = remember {
+        mutableStateOf(false)
+    }
+
+    val isAllergyOptionsShowing = remember {
+        mutableStateOf(false)
+    }
+
+    PresetOptionsDialog(
+        isShowing = isDietaryOptionsShowing,
+        title = "Restrictions",
+        options = dietaryOptions,
+        onSelectItem = {
+            dietaryRestrictions.value = it
+            onDietaryValueChange(it)
+        })
+
+    PresetOptionsDialog(
+        isShowing = isAllergyOptionsShowing,
+        title = "Allergies",
+        options = allergyOptions,
+        onSelectItem = {
+            foodAllergies.value = it
+            onAllergiesValueChange(it)
+        })
 
     LazyColumn(
         modifier = modifier,
@@ -142,17 +176,41 @@ fun Settings(
             Spacer(modifier = Modifier.height(15.dp))
 
             DefaultTextField(
-                label = "Custom $DIETARY_RESTRICTIONS_LABEL",
+                label = "Save $DIETARY_RESTRICTIONS_LABEL",
                 value = dietaryRestrictions,
                 modifier = Modifier.fillMaxWidth(),
-                onValueChange = onDietaryValueChange
+                onValueChange = onDietaryValueChange,
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_menu_24),
+                        tint = BlueIsh,
+                        contentDescription = "View preset dietary restrictions",
+                        modifier = Modifier.clickable {
+                            focusManager.clearFocus()
+                            isAllergyOptionsShowing.value = false
+                            isDietaryOptionsShowing.value = !isDietaryOptionsShowing.value
+                        }
+                    )
+                }
             )
 
             DefaultTextField(
-                label = "Custom $FOOD_ALLERGY_LABEL",
+                label = "Save $FOOD_ALLERGY_LABEL",
                 value = foodAllergies,
                 modifier = Modifier.fillMaxWidth(),
-                onValueChange = onAllergiesValueChange
+                onValueChange = onAllergiesValueChange,
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_menu_24),
+                        tint = BlueIsh,
+                        contentDescription = "View preset food allergies",
+                        modifier = Modifier.clickable {
+                            focusManager.clearFocus()
+                            isDietaryOptionsShowing.value = false
+                            isAllergyOptionsShowing.value = !isAllergyOptionsShowing.value
+                        }
+                    )
+                }
             )
 
             Spacer(modifier = Modifier.height(15.dp))
