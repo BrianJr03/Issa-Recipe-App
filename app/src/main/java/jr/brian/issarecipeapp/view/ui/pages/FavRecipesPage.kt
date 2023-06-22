@@ -314,10 +314,6 @@ fun RecipeBox(
         mutableStateOf(false)
     }
 
-    val isToBeDeleted = remember {
-        mutableStateOf(false)
-    }
-
     val scope = rememberCoroutineScope()
 
     RecipeContentDialog(
@@ -327,15 +323,12 @@ fun RecipeBox(
         isShowing = isShowingRecipe,
     ) {
         scope.launch {
-            isToBeDeleted.value = true
-            favRecipes.remove(recipe)
-            delay(500)
-            isToBeDeleted.value = false
             isShowingRecipe.value = false
+            delay(300)
+            favRecipes.remove(recipe)
         }
     }
 
-    AnimatedVisibility(visible = !isToBeDeleted.value) {
         Box(modifier = modifier
             .padding(16.dp)
             .clip(RoundedCornerShape(10.dp))
@@ -352,7 +345,7 @@ fun RecipeBox(
                 textAlign = TextAlign.Center,
                 fontSize = 20.sp
             )
-        }
+
     }
 }
 
