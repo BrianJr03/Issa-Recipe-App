@@ -49,12 +49,19 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val storedApiKey = dataStore.getApiKey.collectAsState(initial = "").value ?: ""
+                    val dietaryRestrictions =
+                        dataStore.getDietaryRestrictions.collectAsState(initial = "").value ?: ""
+                    val foodAllergies =
+                        dataStore.getFoodAllergies.collectAsState(initial = "").value ?: ""
+
                     ApiService.ApiKey.userApiKey = storedApiKey
 
                     dao?.let {
                         AppUI(
                             dao = it,
                             storedApiKey = storedApiKey,
+                            storedDietaryRestrictions = dietaryRestrictions,
+                            storedFoodAllergies = foodAllergies,
                             dataStore = dataStore
                         )
                     }
@@ -68,6 +75,8 @@ class MainActivity : ComponentActivity() {
 fun AppUI(
     dao: RecipeDao,
     storedApiKey: String,
+    storedDietaryRestrictions: String,
+    storedFoodAllergies: String,
     dataStore: AppDataStore
 ) {
     val navController = rememberNavController()
@@ -95,7 +104,11 @@ fun AppUI(
             )
         })
         composable(MEAL_DETAILS_ROUTE, content = {
-            GenerateRecipePage(dao = dao) {
+            GenerateRecipePage(
+                dao = dao,
+                dietaryRestrictions = storedDietaryRestrictions,
+                foodAllergies = storedFoodAllergies,
+            ) {
                 navController.navigate(SETTINGS_ROUTE) {
                     launchSingleTop = true
                 }
@@ -110,7 +123,9 @@ fun AppUI(
         composable(SETTINGS_ROUTE, content = {
             SettingsPage(
                 apiKey = storedApiKey,
-                dataStore = dataStore
+                dietaryRestrictions = storedDietaryRestrictions,
+                foodAllergies = storedFoodAllergies,
+                dataStore = dataStore,
             )
         })
     })

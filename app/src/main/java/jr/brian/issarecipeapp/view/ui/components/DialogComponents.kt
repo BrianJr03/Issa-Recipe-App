@@ -35,6 +35,7 @@ import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.model.local.RecipeFolder
+import jr.brian.issarecipeapp.util.NO_REJECTED_RECIPES_DIALOG_LABEL
 import jr.brian.issarecipeapp.util.RECIPE_NAME_MAX_CHAR_COUNT
 import jr.brian.issarecipeapp.util.REJECTED_RECIPES_DIALOG_LABEL
 import jr.brian.issarecipeapp.util.customTextSelectionColors
@@ -323,7 +324,8 @@ fun RejectedRecipeHistoryDialog(
     onSelectItem: (Recipe) -> Unit,
 ) {
     ShowDialog(
-        title = REJECTED_RECIPES_DIALOG_LABEL,
+        title = if (recipes.isEmpty()) NO_REJECTED_RECIPES_DIALOG_LABEL
+        else REJECTED_RECIPES_DIALOG_LABEL,
         content = {
             LazyColumn() {
                 items(recipes.size) { index ->
@@ -399,10 +401,12 @@ fun RejectedRecipeContentDialog(
                 painter = painterResource(id = R.drawable.baseline_arrow_back_24),
                 contentDescription = "Back",
                 tint = BlueIsh,
-                modifier = Modifier.padding(end = 30.dp).clickable {
-                    dao.insertRecipe(recipe = recipe)
-                    isShowing.value = false
-                })
+                modifier = Modifier
+                    .padding(end = 30.dp)
+                    .clickable {
+                        dao.insertRecipe(recipe = recipe)
+                        isShowing.value = false
+                    })
         },
         isShowing = isShowing
     )

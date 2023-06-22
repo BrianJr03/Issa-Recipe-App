@@ -4,6 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,11 +25,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import jr.brian.issarecipeapp.model.local.AppDataStore
 import jr.brian.issarecipeapp.util.API_KEY_LABEL
+import jr.brian.issarecipeapp.util.DIETARY_RESTRICTIONS_LABEL
+import jr.brian.issarecipeapp.util.FOOD_ALLERGY_LABEL
 import jr.brian.issarecipeapp.util.GENERATE_API_KEY_URL
 import jr.brian.issarecipeapp.view.ui.components.DefaultTextField
 import kotlinx.coroutines.launch
@@ -36,6 +41,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsPage(
     apiKey: String,
+    dietaryRestrictions: String,
+    foodAllergies: String,
     dataStore: AppDataStore
 ) {
     val scope = rememberCoroutineScope()
@@ -44,9 +51,20 @@ fun SettingsPage(
         mutableStateOf(apiKey)
     }
 
+    val dietary = remember {
+        mutableStateOf(dietaryRestrictions)
+    }
+
+    val allergies = remember {
+        mutableStateOf(foodAllergies)
+    }
+
     val pagerState = rememberPagerState()
 
     val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    val focusManager = LocalFocusManager.current
+    val interactionSource = remember { MutableInteractionSource() }
 
     val callback = remember {
         object : OnBackPressedCallback(true) {
@@ -72,13 +90,30 @@ fun SettingsPage(
 
     Scaffold {
         Settings(
-            apiKey = key, onApiKeyValueChange = {
+            apiKey = key,
+            dietaryRestrictions = dietary,
+            foodAllergies = allergies,
+            onApiKeyValueChange = {
                 scope.launch {
                     dataStore.saveApiKey(it)
                 }
-            }, modifier = Modifier
+            },
+            onDietaryValueChange = {
+                scope.launch {
+                    dataStore.saveDietaryRestrictions(it)
+                }
+            },
+            onAllergiesValueChange = {
+                scope.launch {
+                    dataStore.saveFoodAllergies(it)
+                }
+            },
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
+                .clickable(interactionSource = interactionSource, indication = null) {
+                    focusManager.clearFocus()
+                }
         )
     }
 }
@@ -86,7 +121,11 @@ fun SettingsPage(
 @Composable
 fun Settings(
     apiKey: MutableState<String>,
+    dietaryRestrictions: MutableState<String>,
+    foodAllergies: MutableState<String>,
     onApiKeyValueChange: (String) -> Unit,
+    onDietaryValueChange: (String) -> Unit,
+    onAllergiesValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -101,6 +140,23 @@ fun Settings(
     ) {
         item {
             Spacer(modifier = Modifier.height(15.dp))
+
+            DefaultTextField(
+                label = "Custom $DIETARY_RESTRICTIONS_LABEL",
+                value = dietaryRestrictions,
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = onDietaryValueChange
+            )
+
+            DefaultTextField(
+                label = "Custom $FOOD_ALLERGY_LABEL",
+                value = foodAllergies,
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = onAllergiesValueChange
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
             DefaultTextField(
                 label = API_KEY_LABEL,
                 value = apiKey,
@@ -108,6 +164,7 @@ fun Settings(
                 modifier = Modifier.fillMaxWidth(),
                 isShowingErrorColor = showErrorColorAPiKey
             )
+
             Button(
                 onClick = {
                     val intent = Intent(Intent.ACTION_VIEW)

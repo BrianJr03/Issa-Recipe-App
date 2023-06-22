@@ -25,6 +25,7 @@ const val lunchEndHour = 14
 
 const val UP_SIDE_DOWN_FACE_EMOJI = "\uD83D\uDE43"
 const val SAD_FACE_EMOJI = "\uD83D\uDE14"
+const val COOL_FACE_EMOJI = "\uD83D\uDE0E"
 
 const val NO_RECIPES_TO_SWIPE_MSG = "No recipes to swipe at this time. Please check again later."
 const val CONNECTION_TIMEOUT_MSG = "connection timed out. please try again."
@@ -39,3 +40,4 @@ const val GENERATE_API_KEY_URL = "https://platform.openai.com/account/api-keys"
 const val HOME_NAV_DELAY = 300L
 
 const val REJECTED_RECIPES_DIALOG_LABEL = "Rejected Recipes $SAD_FACE_EMOJI"
+const val NO_REJECTED_RECIPES_DIALOG_LABEL = "No Rejected Recipes $COOL_FACE_EMOJI"

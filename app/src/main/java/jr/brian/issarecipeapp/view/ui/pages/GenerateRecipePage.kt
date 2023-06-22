@@ -77,6 +77,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun GenerateRecipePage(
     dao: RecipeDao,
+    dietaryRestrictions: String,
+    foodAllergies: String,
     viewModel: MainViewModel = hiltViewModel(),
     onNavToSettings: () -> Unit
 ) {
@@ -84,8 +86,15 @@ fun GenerateRecipePage(
 
     val mealType = remember { mutableStateOf("") }
     val servingSize = remember { mutableStateOf("") }
-    val dietaryRestrictions = remember { mutableStateOf("") }
-    val foodAllergies = remember { mutableStateOf("") }
+
+    val dietary = remember {
+        mutableStateOf(dietaryRestrictions)
+    }
+
+    val allergies = remember {
+        mutableStateOf(foodAllergies)
+    }
+
     val ingredients = remember { mutableStateOf("") }
     val additionalInfo = remember { mutableStateOf("") }
 
@@ -154,8 +163,8 @@ fun GenerateRecipePage(
                             MealDetails(
                                 occasion = mealType,
                                 partySize = servingSize,
-                                dietaryRestrictions = dietaryRestrictions,
-                                foodAllergies = foodAllergies,
+                                dietaryRestrictions = dietary,
+                                foodAllergies = allergies,
                                 ingredients = ingredients,
                                 additionalInfo = additionalInfo,
                                 generatedRecipe = generatedRecipe,
@@ -189,6 +198,7 @@ fun GenerateRecipePage(
                 activeColor = BlueIsh,
                 inactiveColor = Color.Gray,
                 modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
                     .align(Alignment.CenterHorizontally)
                     .padding(16.dp),
             )
@@ -276,8 +286,7 @@ fun MealDetails(
             DefaultTextField(
                 label = PARTY_SIZE_LABEL,
                 value = partySize,
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 maxCount = PARTY_SIZE_MAX_CHAR_COUNT,
                 isShowingErrorColor = showErrorColorPartySize
             )
@@ -285,16 +294,14 @@ fun MealDetails(
             DefaultTextField(
                 label = INGREDIENTS_LABEL,
                 value = ingredients,
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 isShowingErrorColor = showErrorColorIngredients
             )
 
             DefaultTextField(
                 label = "Occasion | Ex: $randomMealOccasion",
                 value = occasion,
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_menu_24),
@@ -313,8 +320,7 @@ fun MealDetails(
             DefaultTextField(
                 label = DIETARY_RESTRICTIONS_LABEL,
                 value = dietaryRestrictions,
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_menu_24),
@@ -328,14 +334,12 @@ fun MealDetails(
                         }
                     )
                 }
-
             )
 
             DefaultTextField(
                 label = FOOD_ALLERGY_LABEL,
                 value = foodAllergies,
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_menu_24),
@@ -354,8 +358,7 @@ fun MealDetails(
             DefaultTextField(
                 label = "Other Info | Ex: $randomInfo",
                 value = additionalInfo,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
 
             AnimatedVisibility(visible = isGenerateBtnShowing.value) {
