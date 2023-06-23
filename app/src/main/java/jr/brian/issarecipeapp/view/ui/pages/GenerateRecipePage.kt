@@ -35,6 +35,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -49,6 +51,7 @@ import com.google.accompanist.pager.rememberPagerState
 import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
+import jr.brian.issarecipeapp.model.remote.ApiService
 import jr.brian.issarecipeapp.util.DIETARY_RESTRICTIONS_LABEL
 import jr.brian.issarecipeapp.util.FOOD_ALLERGY_LABEL
 import jr.brian.issarecipeapp.util.INGREDIENTS_LABEL
@@ -76,14 +79,24 @@ import kotlinx.coroutines.launch
 @Composable
 fun GenerateRecipePage(
     dao: RecipeDao,
-    viewModel: MainViewModel = hiltViewModel()
+    dietaryRestrictions: String,
+    foodAllergies: String,
+    viewModel: MainViewModel = hiltViewModel(),
+    onNavToSettings: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
     val mealType = remember { mutableStateOf("") }
     val servingSize = remember { mutableStateOf("") }
-    val dietaryRestrictions = remember { mutableStateOf("") }
-    val foodAllergies = remember { mutableStateOf("") }
+
+    val dietary = remember {
+        mutableStateOf(dietaryRestrictions)
+    }
+
+    val allergies = remember {
+        mutableStateOf(foodAllergies)
+    }
+
     val ingredients = remember { mutableStateOf("") }
     val additionalInfo = remember { mutableStateOf("") }
 
@@ -108,6 +121,7 @@ fun GenerateRecipePage(
     val callback = remember {
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                focusManager.clearFocus()
                 if (pagerState.currentPage == 1) {
                     scope.launch {
                         pagerState.animateScrollToPage(0)
@@ -152,8 +166,8 @@ fun GenerateRecipePage(
                             MealDetails(
                                 occasion = mealType,
                                 partySize = servingSize,
-                                dietaryRestrictions = dietaryRestrictions,
-                                foodAllergies = foodAllergies,
+                                dietaryRestrictions = dietary,
+                                foodAllergies = allergies,
                                 ingredients = ingredients,
                                 additionalInfo = additionalInfo,
                                 generatedRecipe = generatedRecipe,
@@ -161,7 +175,9 @@ fun GenerateRecipePage(
                                 pagerState = pagerState,
                                 scope = scope,
                                 viewModel = viewModel,
-                                loading = loading
+                                loading = loading,
+                                onNavToSettings = onNavToSettings,
+                                focusManager = focusManager
                             )
                         }
 
@@ -187,6 +203,7 @@ fun GenerateRecipePage(
                 inactiveColor = Color.Gray,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
+                    .align(Alignment.CenterHorizontally)
                     .padding(16.dp),
             )
         }
@@ -207,10 +224,10 @@ fun MealDetails(
     pagerState: PagerState,
     scope: CoroutineScope,
     viewModel: MainViewModel,
-    loading: State<Boolean>
+    loading: State<Boolean>,
+    onNavToSettings: () -> Unit,
+    focusManager: FocusManager
 ) {
-    val focusManager = LocalFocusManager.current
-
     val showErrorColorIngredients = remember {
         mutableStateOf(false)
     }
@@ -239,6 +256,14 @@ fun MealDetails(
         mutableStateOf(true)
     }
 
+    val isPartySizeFocused = remember { mutableStateOf(false) }
+    val isIngredientsFocused = remember { mutableStateOf(false) }
+    val isOccasionFocused = remember { mutableStateOf(false) }
+    val isDietaryFocused = remember { mutableStateOf(false) }
+    val isAllergiesFocused = remember { mutableStateOf(false) }
+    val isOtherFocused = remember { mutableStateOf(false) }
+    val isTapInfoShowing = remember { mutableStateOf(false) }
+
     PresetOptionsDialog(
         isShowing = isOccasionOptionsShowing,
         title = "Occasions",
@@ -264,97 +289,193 @@ fun MealDetails(
         })
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(1) {
-            DefaultTextField(
-                label = PARTY_SIZE_LABEL,
-                value = partySize,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                maxCount = PARTY_SIZE_MAX_CHAR_COUNT,
-                isShowingErrorColor = showErrorColorPartySize
-            )
+        item {
+            AnimatedVisibility(
+                visible =
+                !isIngredientsFocused.value &&
+                        !isOccasionFocused.value &&
+                        !isDietaryFocused.value &&
+                        !isAllergiesFocused.value &&
+                        !isOtherFocused.value
+            ) {
+                DefaultTextField(
+                    label = PARTY_SIZE_LABEL,
+                    value = partySize,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged {
+                            isPartySizeFocused.value = it.isFocused
+                        },
+                    maxCount = PARTY_SIZE_MAX_CHAR_COUNT,
+                    isShowingErrorColor = showErrorColorPartySize,
+                    onDone = {
+                        focusManager.clearFocus()
+                    }
+                )
+            }
 
-            DefaultTextField(
-                label = INGREDIENTS_LABEL,
-                value = ingredients,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                isShowingErrorColor = showErrorColorIngredients
-            )
+            AnimatedVisibility(
+                visible =
+                !isPartySizeFocused.value &&
+                        !isOccasionFocused.value &&
+                        !isDietaryFocused.value &&
+                        !isAllergiesFocused.value &&
+                        !isOtherFocused.value
+            ) {
+                DefaultTextField(
+                    label = INGREDIENTS_LABEL,
+                    value = ingredients,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged {
+                            isIngredientsFocused.value = it.isFocused
+                        },
+                    isShowingErrorColor = showErrorColorIngredients,
+                    onDone = {
+                        focusManager.clearFocus()
+                    }
+                )
+            }
 
-            DefaultTextField(
-                label = "Occasion | Ex: $randomMealOccasion",
-                value = occasion,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                trailingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_menu_24),
-                        tint = BlueIsh,
-                        contentDescription = "View preset occasion options",
-                        modifier = Modifier.clickable {
-                            focusManager.clearFocus()
-                            isDietaryOptionsShowing.value = false
-                            isAllergyOptionsShowing.value = false
-                            isOccasionOptionsShowing.value = !isOccasionOptionsShowing.value
-                        }
-                    )
-                }
-            )
+            AnimatedVisibility(
+                visible =
+                !isIngredientsFocused.value &&
+                        !isPartySizeFocused.value &&
+                        !isDietaryFocused.value &&
+                        !isAllergiesFocused.value &&
+                        !isOtherFocused.value
+            ) {
+                DefaultTextField(
+                    label = "Occasion | Ex: $randomMealOccasion",
+                    value = occasion,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged {
+                            isOccasionFocused.value = it.isFocused
+                        },
+                    trailingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_menu_24),
+                            tint = BlueIsh,
+                            contentDescription = "View preset occasion options",
+                            modifier = Modifier.clickable {
+                                focusManager.clearFocus()
+                                isDietaryOptionsShowing.value = false
+                                isAllergyOptionsShowing.value = false
+                                isOccasionOptionsShowing.value = !isOccasionOptionsShowing.value
+                            }
+                        )
+                    },
+                    onDone = {
+                        focusManager.clearFocus()
+                    }
+                )
+            }
 
-            DefaultTextField(
-                label = DIETARY_RESTRICTIONS_LABEL,
-                value = dietaryRestrictions,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                trailingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_menu_24),
-                        tint = BlueIsh,
-                        contentDescription = "View preset dietary options",
-                        modifier = Modifier.clickable {
-                            focusManager.clearFocus()
-                            isOccasionOptionsShowing.value = false
-                            isAllergyOptionsShowing.value = false
-                            isDietaryOptionsShowing.value = !isDietaryOptionsShowing.value
-                        }
-                    )
-                }
+            AnimatedVisibility(
+                visible =
+                !isIngredientsFocused.value &&
+                        !isOccasionFocused.value &&
+                        !isPartySizeFocused.value &&
+                        !isAllergiesFocused.value &&
+                        !isOtherFocused.value
+            ) {
+                DefaultTextField(
+                    label = DIETARY_RESTRICTIONS_LABEL,
+                    value = dietaryRestrictions,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged {
+                            isDietaryFocused.value = it.isFocused
+                        },
+                    trailingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_menu_24),
+                            tint = BlueIsh,
+                            contentDescription = "View preset dietary restrictions",
+                            modifier = Modifier.clickable {
+                                focusManager.clearFocus()
+                                isOccasionOptionsShowing.value = false
+                                isAllergyOptionsShowing.value = false
+                                isDietaryOptionsShowing.value = !isDietaryOptionsShowing.value
+                            }
+                        )
+                    },
+                    onDone = {
+                        focusManager.clearFocus()
+                    }
+                )
+            }
 
-            )
+            AnimatedVisibility(
+                visible =
+                !isIngredientsFocused.value &&
+                        !isOccasionFocused.value &&
+                        !isDietaryFocused.value &&
+                        !isPartySizeFocused.value &&
+                        !isOtherFocused.value
+            ) {
+                DefaultTextField(
+                    label = FOOD_ALLERGY_LABEL,
+                    value = foodAllergies,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged {
+                            isAllergiesFocused.value = it.isFocused
+                        },
+                    trailingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_menu_24),
+                            tint = BlueIsh,
+                            contentDescription = "View preset food allergies",
+                            modifier = Modifier.clickable {
+                                focusManager.clearFocus()
+                                isDietaryOptionsShowing.value = false
+                                isOccasionOptionsShowing.value = false
+                                isAllergyOptionsShowing.value = !isAllergyOptionsShowing.value
+                            }
+                        )
+                    },
+                    onDone = {
+                        focusManager.clearFocus()
+                    }
+                )
+            }
 
-            DefaultTextField(
-                label = FOOD_ALLERGY_LABEL,
-                value = foodAllergies,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                trailingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_menu_24),
-                        tint = BlueIsh,
-                        contentDescription = "View preset allergy options",
-                        modifier = Modifier.clickable {
-                            focusManager.clearFocus()
-                            isDietaryOptionsShowing.value = false
-                            isOccasionOptionsShowing.value = false
-                            isAllergyOptionsShowing.value = !isAllergyOptionsShowing.value
-                        }
-                    )
-                }
-            )
+            AnimatedVisibility(
+                visible =
+                !isIngredientsFocused.value &&
+                        !isOccasionFocused.value &&
+                        !isDietaryFocused.value &&
+                        !isAllergiesFocused.value &&
+                        !isPartySizeFocused.value
+            ) {
+                DefaultTextField(
+                    label = "Other Info | Ex: $randomInfo",
+                    value = additionalInfo,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged {
+                            isOtherFocused.value = it.isFocused
+                        },
+                    onDone = {
+                        focusManager.clearFocus()
+                    }
+                )
+            }
 
-            DefaultTextField(
-                label = "Other Info | Ex: $randomInfo",
-                value = additionalInfo,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-
-            AnimatedVisibility(visible = isGenerateBtnShowing.value) {
+            AnimatedVisibility(
+                visible = isGenerateBtnShowing.value &&
+                        !isIngredientsFocused.value &&
+                        !isOccasionFocused.value &&
+                        !isDietaryFocused.value &&
+                        !isAllergiesFocused.value &&
+                        !isPartySizeFocused.value &&
+                        !isOtherFocused.value
+            ) {
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -363,10 +484,12 @@ fun MealDetails(
                             end = 15.dp
                         ),
                     onClick = {
-                        if (partySize.value.toIntOrNull() == null) {
-                            showErrorColorPartySize.value = true
+                        if (ApiService.ApiKey.userApiKey.isBlank()) {
+                            onNavToSettings()
                         } else if (ingredients.value.isBlank()) {
                             showErrorColorIngredients.value = true
+                        } else if (partySize.value.toIntOrNull() == null) {
+                            showErrorColorPartySize.value = true
                         } else if (!loading.value) {
                             scope.launch {
                                 delay(300)
@@ -379,12 +502,12 @@ fun MealDetails(
                             foodAllergies.value = foodAllergies.value.ifBlankUse("none")
 
                             val query = generateRecipeQuery(
-                                occasion = occasion,
-                                partySize = partySize,
-                                dietaryRestrictions = dietaryRestrictions,
-                                foodAllergies = foodAllergies,
-                                ingredients = ingredients,
-                                additionalInfo = additionalInfo,
+                                occasion = occasion.value,
+                                partySize = partySize.value,
+                                dietaryRestrictions = dietaryRestrictions.value,
+                                foodAllergies = foodAllergies.value,
+                                ingredients = ingredients.value,
+                                additionalInfo = additionalInfo.value,
                             )
 
                             focusManager.clearFocus()
@@ -423,9 +546,12 @@ fun MealDetails(
                             end = 15.dp
                         ),
                     onClick = {
-                        if (!loading.value) {
+                        if (ApiService.ApiKey.userApiKey.isBlank()) {
+                            onNavToSettings()
+                        } else if (!loading.value) {
                             scope.launch {
                                 delay(300)
+                                isTapInfoShowing.value = false
                                 isGenerateBtnShowing.value = false
                             }
 
@@ -437,12 +563,12 @@ fun MealDetails(
                             additionalInfo.value = "provide random recipe"
 
                             val query = generateRecipeQuery(
-                                occasion = occasion,
-                                partySize = partySize,
-                                dietaryRestrictions = dietaryRestrictions,
-                                foodAllergies = foodAllergies,
-                                ingredients = ingredients,
-                                additionalInfo = additionalInfo,
+                                occasion = occasion.value,
+                                partySize = partySize.value,
+                                dietaryRestrictions = dietaryRestrictions.value,
+                                foodAllergies = foodAllergies.value,
+                                ingredients = ingredients.value,
+                                additionalInfo = additionalInfo.value,
                             )
 
                             showErrorColorPartySize.value = false
@@ -470,6 +596,29 @@ fun MealDetails(
                     } else {
                         Text("Random Recipe")
                     }
+                }
+            }
+
+            AnimatedVisibility(
+                visible = isTapInfoShowing.value ||
+                        isIngredientsFocused.value ||
+                        isOccasionFocused.value ||
+                        isDietaryFocused.value ||
+                        isAllergiesFocused.value ||
+                        isPartySizeFocused.value ||
+                        isOtherFocused.value
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 30.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_info_24),
+                        contentDescription = "Tap Info",
+                        tint = BlueIsh
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(text = "Tap anywhere to show all fields")
                 }
             }
         }

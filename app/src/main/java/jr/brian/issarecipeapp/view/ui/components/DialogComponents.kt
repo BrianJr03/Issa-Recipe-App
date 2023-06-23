@@ -35,7 +35,9 @@ import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.model.local.RecipeFolder
+import jr.brian.issarecipeapp.util.NO_REJECTED_RECIPES_DIALOG_LABEL
 import jr.brian.issarecipeapp.util.RECIPE_NAME_MAX_CHAR_COUNT
+import jr.brian.issarecipeapp.util.REJECTED_RECIPES_DIALOG_LABEL
 import jr.brian.issarecipeapp.util.customTextSelectionColors
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import kotlinx.coroutines.delay
@@ -316,6 +318,102 @@ fun RecipeContentDialog(
 }
 
 @Composable
+fun RejectedRecipeHistoryDialog(
+    isShowing: MutableState<Boolean>,
+    recipes: List<Recipe>,
+    onSelectItem: (Recipe) -> Unit,
+) {
+    ShowDialog(
+        title = if (recipes.isEmpty()) NO_REJECTED_RECIPES_DIALOG_LABEL
+        else REJECTED_RECIPES_DIALOG_LABEL,
+        content = {
+            LazyColumn() {
+                items(recipes.size) { index ->
+                    val selectedRecipe = recipes[index]
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onSelectItem(selectedRecipe)
+                                isShowing.value = false
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            selectedRecipe.name,
+                            style = TextStyle(fontSize = 16.sp),
+                            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                    if (index != recipes.size - 1) {
+                        Divider()
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {},
+        isShowing = isShowing
+    )
+}
+
+@Composable
+fun RejectedRecipeContentDialog(
+    dao: RecipeDao,
+    recipe: Recipe,
+    isShowing: MutableState<Boolean>
+) {
+    ShowDialog(
+        title = recipe.name,
+        content = {
+            LazyColumn(content = {
+                items(1) {
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                        CompositionLocalProvider(
+                            LocalTextSelectionColors provides customTextSelectionColors
+                        ) {
+                            SelectionContainer {
+                                Text(
+                                    recipe.recipe,
+                                    modifier = Modifier.padding(15.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            })
+        },
+        confirmButton = {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_favorite_24),
+                contentDescription = "Favorite",
+                tint = BlueIsh,
+                modifier = Modifier.clickable {
+                    dao.insertRecipe(recipe = recipe)
+                    isShowing.value = false
+                })
+        },
+        dismissButton = {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_arrow_back_24),
+                contentDescription = "Back",
+                tint = BlueIsh,
+                modifier = Modifier
+                    .padding(end = 30.dp)
+                    .clickable {
+                        dao.insertRecipe(recipe = recipe)
+                        isShowing.value = false
+                    })
+        },
+        isShowing = isShowing
+    )
+}
+
+@Composable
+@Suppress("unused_parameter")
 fun FolderContentDialog(
     dao: RecipeDao,
     folder: RecipeFolder,

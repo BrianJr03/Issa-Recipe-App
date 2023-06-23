@@ -38,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -121,11 +122,15 @@ fun FavRecipesPage(dao: RecipeDao) {
                         }
 
                         1 -> {
-                            FoldersGrid(
-                                dao = dao,
+                            FoldersComingSoon(
                                 focusManager = focusManager,
                                 interactionSource = interactionSource
                             )
+//                            FoldersGrid(
+//                                dao = dao,
+//                                focusManager = focusManager,
+//                                interactionSource = interactionSource
+//                            )
                         }
                     }
 
@@ -203,7 +208,30 @@ fun RecipeGrid(
     }
 }
 
+@Composable
+fun FoldersComingSoon(
+    focusManager: FocusManager,
+    interactionSource: MutableInteractionSource
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { focusManager.clearFocus() }
+    ) {
+        Text(
+            text = "Folder Support Coming Soon.",
+            style = TextStyle(fontSize = 20.sp, color = BlueIsh)
+        )
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
+@Suppress("unused")
 @Composable
 fun FoldersGrid(
     dao: RecipeDao,
@@ -286,10 +314,6 @@ fun RecipeBox(
         mutableStateOf(false)
     }
 
-    val isToBeDeleted = remember {
-        mutableStateOf(false)
-    }
-
     val scope = rememberCoroutineScope()
 
     RecipeContentDialog(
@@ -299,15 +323,12 @@ fun RecipeBox(
         isShowing = isShowingRecipe,
     ) {
         scope.launch {
-            isToBeDeleted.value = true
-            favRecipes.remove(recipe)
-            delay(500)
-            isToBeDeleted.value = false
             isShowingRecipe.value = false
+            delay(300)
+            favRecipes.remove(recipe)
         }
     }
 
-    AnimatedVisibility(visible = !isToBeDeleted.value) {
         Box(modifier = modifier
             .padding(16.dp)
             .clip(RoundedCornerShape(10.dp))
@@ -324,7 +345,7 @@ fun RecipeBox(
                 textAlign = TextAlign.Center,
                 fontSize = 20.sp
             )
-        }
+
     }
 }
 
