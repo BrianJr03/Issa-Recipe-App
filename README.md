@@ -13,7 +13,7 @@
 
 ## About the Project
 
-A simple recipe app powered by ChatGPT. Swipe or Generate your own recipes and find your next favorite dish!
+A simple [recipe app](https://youtu.be/8a2mytF2KMw) powered by ChatGPT. Swipe or Generate your own recipes and find your next favorite dish!
 
 `Note`: An OpenAI [API Key](https://platform.openai.com/account/api-keys) is needed to use this app
 
