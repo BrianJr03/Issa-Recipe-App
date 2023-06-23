@@ -329,7 +329,7 @@ fun RejectedRecipeHistoryDialog(
         content = {
             LazyColumn() {
                 items(recipes.size) { index ->
-                    val selectedRecipe = recipes[index]
+                    val selectedRecipe = recipes.reversed()[index]
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
