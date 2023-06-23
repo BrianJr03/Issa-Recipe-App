@@ -55,7 +55,7 @@ fun RecipeSwipe(
             }, onReject = {
                 with(RejectedRecipeCache.cache) {
                     if (size == 7) {
-                        remove(last())
+                        remove(first())
                         add(it)
                     } else {
                         add(it)
