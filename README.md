@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="100" src="./docs/assets/logo-noBackground.png">
+  <img width="200" src="https://github.com/BrianJr03/Issa-Recipe-App/blob/main/docs/assets/icons8-cookbook-512.png">
   <br><br>
 </div>
 
