@@ -18,11 +18,7 @@ A simple recipe app powered by ChatGPT. Swipe or Generate your own recipes and f
 `Note`: An OpenAI [API Key](https://platform.openai.com/account/api-keys) is needed to use this app
 
 <div align="center">
-  <img src="./docs/assets/main.jpeg" width="300"  />
-  <img style="margin-left: 300px" src="./docs/assets/how-to-use.jpeg" width="300"/>
-  <img style="margin-left: 300px" src="./docs/assets/settings.jpeg" width="300"/>
-  <img style="margin-left: 300px" src="./docs/assets/multiple-convos.jpeg" width="300"/>
-  <img style="margin-left: 300px" src="./docs/assets/select-theme.jpeg" width="300"/>
+  <img src="https://github.com/BrianJr03/Issa-Recipe-App/blob/main/docs/assets/recipe_app_ss.png"/>
 </div>
 
 ## Features
