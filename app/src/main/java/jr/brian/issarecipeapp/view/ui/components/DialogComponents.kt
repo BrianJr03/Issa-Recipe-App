@@ -347,7 +347,7 @@ fun RejectedRecipeHistoryDialog(
                         Spacer(modifier = Modifier.weight(1f))
                     }
                     if (index != recipes.size - 1) {
-                        Divider()
+                        Divider(color = BlueIsh)
                     }
                 }
             }

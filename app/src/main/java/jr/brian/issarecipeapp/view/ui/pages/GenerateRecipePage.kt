@@ -1,5 +1,6 @@
 package jr.brian.issarecipeapp.view.ui.pages
 
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
@@ -38,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -228,6 +230,8 @@ fun MealDetails(
     onNavToSettings: () -> Unit,
     focusManager: FocusManager
 ) {
+    val context = LocalContext.current
+
     val showErrorColorIngredients = remember {
         mutableStateOf(false)
     }
@@ -485,6 +489,8 @@ fun MealDetails(
                         ),
                     onClick = {
                         if (ApiService.ApiKey.userApiKey.isBlank()) {
+                            Toast.makeText(context, "API Key is required", Toast.LENGTH_SHORT)
+                                .show()
                             onNavToSettings()
                         } else if (ingredients.value.isBlank()) {
                             showErrorColorIngredients.value = true
@@ -547,6 +553,8 @@ fun MealDetails(
                         ),
                     onClick = {
                         if (ApiService.ApiKey.userApiKey.isBlank()) {
+                            Toast.makeText(context, "API Key is required", Toast.LENGTH_SHORT)
+                                .show()
                             onNavToSettings()
                         } else if (!loading.value) {
                             scope.launch {
