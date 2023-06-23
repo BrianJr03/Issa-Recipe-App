@@ -18,10 +18,10 @@ const val INGREDIENTS_LABEL = "Ingredients *"
 const val RECIPE_NAME_MAX_CHAR_COUNT = 40
 const val PARTY_SIZE_MAX_CHAR_COUNT = 4
 
-const val breakfastStartHour = 7
-const val breakfastEndHour = 10
-const val lunchStartHour = 11
-const val lunchEndHour = 14
+const val breakfastStartHour = 5 // 5 AM
+const val breakfastEndHour = 10 // 10 AM
+const val lunchStartHour = 11 // 11 AM
+const val lunchEndHour = 16 // 4 PM
 
 const val UP_SIDE_DOWN_FACE_EMOJI = "\uD83D\uDE43"
 const val SAD_FACE_EMOJI = "\uD83D\uDE14"
