@@ -107,12 +107,12 @@ fun SettingsPage(
             },
             onDietaryValueChange = {
                 scope.launch {
-                    dataStore.saveDietaryRestrictions(it)
+                    dataStore.saveDietaryRestrictions(it.lowercase())
                 }
             },
             onAllergiesValueChange = {
                 scope.launch {
-                    dataStore.saveFoodAllergies(it)
+                    dataStore.saveFoodAllergies(it.lowercase())
                 }
             },
             modifier = Modifier

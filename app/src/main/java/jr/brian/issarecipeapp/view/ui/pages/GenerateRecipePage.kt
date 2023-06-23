@@ -557,8 +557,8 @@ fun MealDetails(
 
                             occasion.value = "any occasion"
                             partySize.value = "1"
-                            dietaryRestrictions.value = "none"
-                            foodAllergies.value = "none"
+                            dietaryRestrictions.value = dietaryRestrictions.value.ifBlank { "none" }
+                            foodAllergies.value = foodAllergies.value.ifBlank { "none" }
                             ingredients.value = "use random ingredients"
                             additionalInfo.value = "provide random recipe"
 
