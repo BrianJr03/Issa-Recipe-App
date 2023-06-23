@@ -94,7 +94,7 @@ fun PresetOptionsDialog(
                         Spacer(modifier = Modifier.weight(1f))
                     }
                     if (index != options.size - 1) {
-                        Divider()
+                        Divider(color = BlueIsh)
                     }
                 }
             }
