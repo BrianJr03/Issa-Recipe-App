@@ -48,11 +48,14 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val storedApiKey = dataStore.getApiKey.collectAsState(initial = "").value ?: ""
+                    val storedApiKey = dataStore.getApiKey.collectAsState(initial = "").value
+                        ?: ""
                     val dietaryRestrictions =
-                        dataStore.getDietaryRestrictions.collectAsState(initial = "none").value ?: "none"
+                        dataStore.getDietaryRestrictions.collectAsState(initial = "none").value
+                            ?: "none"
                     val foodAllergies =
-                        dataStore.getFoodAllergies.collectAsState(initial = "none").value ?: "none"
+                        dataStore.getFoodAllergies.collectAsState(initial = "none").value
+                            ?: "none"
 
                     ApiService.ApiKey.userApiKey = storedApiKey
 
