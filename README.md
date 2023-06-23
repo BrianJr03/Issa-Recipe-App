@@ -25,7 +25,7 @@ A simple recipe app powered by ChatGPT. Swipe or Generate your own recipes and f
 
 - Swipe
   - Browse through randomized recipes and experience Love at first Swipe
-  - `breakfast`, `lunch`, and `dinner` recipes will be accessible based on your devices local time
+  - `breakfast`, `lunch`, and `dinner` recipes will be accessible based on your device's local time
 
 - Generate or Randomize
 
