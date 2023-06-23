@@ -125,6 +125,7 @@ fun AppUI(
         })
         composable(SETTINGS_ROUTE, content = {
             SettingsPage(
+                dao = dao,
                 apiKey = storedApiKey,
                 dietaryRestrictions = storedDietaryRestrictions,
                 foodAllergies = storedFoodAllergies,
