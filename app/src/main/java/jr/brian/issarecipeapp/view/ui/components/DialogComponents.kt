@@ -182,11 +182,14 @@ fun RecipeContentDialog(
     }
 
     val saveNewName = {
-        val newRecipe = Recipe(recipe.recipe, newRecipeName.value)
-        favRecipes[favRecipes.indexOf(recipe)] = newRecipe
-        dao.updateRecipe(recipe = newRecipe)
-        isRenameFieldShowing.value = false
-        isRenameLabelShowing.value = true
+        scope.launch {
+            val newRecipe = Recipe(recipe.recipe, newRecipeName.value)
+            favRecipes[favRecipes.indexOf(recipe)] = newRecipe
+            dao.updateRecipe(recipe = newRecipe)
+            isRenameFieldShowing.value = false
+            delay(300)
+            isRenameLabelShowing.value = true
+        }
     }
 
     val deleteOnLongClick = {
