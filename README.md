@@ -7,8 +7,15 @@
 
 # Issa Recipe App
 
-<div align="center">
-<a href='https://github.com/BrianJr03/Issa-Recipe-App/releases/latest'><img alt='Get it on Github' src='https://raw.githubusercontent.com/ismartcoding/plain-app/main/assets/get-it-on-github.png' height='80px'/></a>
+
+<div style="display: flex; align-items: center; justify-content: center;">
+  <a href='https://github.com/BrianJr03/Issa-Recipe-App/releases/latest'>
+    <img alt='Get it on Github' src='https://raw.githubusercontent.com/ismartcoding/plain-app/main/assets/get-it-on-github.png' height='80px'/>
+  </a>
+
+  <a href='https://play.google.com/store/apps/details?id=jr.brian.issarecipeapp&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'>
+    <img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' height='80px'/>
+  </a>
 </div>
 
 ## About the Project
