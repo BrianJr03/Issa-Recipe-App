@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import jr.brian.issarecipeapp.view.ui.theme.dp_10
 import jr.brian.issarecipeapp.view.ui.theme.dp_15
@@ -66,13 +65,5 @@ fun RecipeCard(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun QuoteCardPreview() {
-    Box(contentAlignment = Alignment.Center) {
-        RecipeCard("Eggs")
     }
 }

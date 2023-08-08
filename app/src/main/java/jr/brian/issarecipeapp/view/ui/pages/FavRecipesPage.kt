@@ -10,6 +10,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,8 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -191,9 +192,9 @@ fun RecipeGrid(
         if (filteredRecipes.value.isEmpty()) {
             Text("No Favorites", color = BlueIsh, fontSize = 20.sp)
         } else {
-            LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(2),
-                verticalArrangement = Arrangement.Center
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2), // Set the number of columns
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp) // Add padding
             ) {
                 items(filteredRecipes.value.size) { index ->
                     val recipe = filteredRecipes.value.reversed()[index]
@@ -285,8 +286,8 @@ fun FoldersGrid(
             Text("No Folders", color = BlueIsh, fontSize = 20.sp)
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                LazyVerticalStaggeredGrid(
-                    columns = StaggeredGridCells.Fixed(2),
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
                     verticalArrangement = Arrangement.Center
                 ) {
                     items(filteredFolders.value.size) { index ->
