@@ -8,9 +8,11 @@ class RepoImpl : Repository {
     }
     override suspend fun getChatGptResponse(
         userPrompt: String,
+        system: String?
     ): String {
         return apiService.getChatGptResponse(
             userPrompt = userPrompt,
+            system = system
         )
     }
 }

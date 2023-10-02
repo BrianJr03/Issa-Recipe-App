@@ -1,6 +1,5 @@
 package jr.brian.issarecipeapp.view.ui.pages
 
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
@@ -54,9 +53,11 @@ import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.model.remote.ApiService
+import jr.brian.issarecipeapp.util.API_KEY_REQUIRED
 import jr.brian.issarecipeapp.util.DIETARY_RESTRICTIONS_LABEL
 import jr.brian.issarecipeapp.util.FOOD_ALLERGY_LABEL
 import jr.brian.issarecipeapp.util.INGREDIENTS_LABEL
+import jr.brian.issarecipeapp.util.NO_RESPONSE_MSG
 import jr.brian.issarecipeapp.util.PARTY_SIZE_LABEL
 import jr.brian.issarecipeapp.util.PARTY_SIZE_MAX_CHAR_COUNT
 import jr.brian.issarecipeapp.util.allergyOptions
@@ -67,6 +68,7 @@ import jr.brian.issarecipeapp.util.ifBlankUse
 import jr.brian.issarecipeapp.util.occasionOptions
 import jr.brian.issarecipeapp.util.randomInfo
 import jr.brian.issarecipeapp.util.randomMealOccasion
+import jr.brian.issarecipeapp.util.showToast
 import jr.brian.issarecipeapp.view.ui.components.DefaultTextField
 import jr.brian.issarecipeapp.view.ui.components.PresetOptionsDialog
 import jr.brian.issarecipeapp.view.ui.components.RecipeNameDialog
@@ -489,8 +491,7 @@ fun MealDetails(
                         ),
                     onClick = {
                         if (ApiService.ApiKey.userApiKey.isBlank()) {
-                            Toast.makeText(context, "API Key is required", Toast.LENGTH_SHORT)
-                                .show()
+                            context.showToast(API_KEY_REQUIRED)
                             onNavToSettings()
                         } else if (ingredients.value.isBlank()) {
                             showErrorColorIngredients.value = true
@@ -522,7 +523,7 @@ fun MealDetails(
                                 generatedRecipe.value = ""
                                 viewModel.getChefGptResponse(userPrompt = query)
                                 generatedRecipe.value =
-                                    viewModel.response.value ?: "Empty Response. Please try again."
+                                    viewModel.response.value ?: NO_RESPONSE_MSG
                                 pagerState.animateScrollToPage(1)
                             }
 
@@ -553,8 +554,7 @@ fun MealDetails(
                         ),
                     onClick = {
                         if (ApiService.ApiKey.userApiKey.isBlank()) {
-                            Toast.makeText(context, "API Key is required", Toast.LENGTH_SHORT)
-                                .show()
+                            context.showToast(API_KEY_REQUIRED)
                             onNavToSettings()
                         } else if (!loading.value) {
                             scope.launch {
@@ -588,7 +588,7 @@ fun MealDetails(
                                 generatedRecipe.value = ""
                                 viewModel.getChefGptResponse(userPrompt = query)
                                 generatedRecipe.value =
-                                    viewModel.response.value ?: "Empty Response. Please try again."
+                                    viewModel.response.value ?: NO_RESPONSE_MSG
                                 pagerState.animateScrollToPage(1)
                             }
 

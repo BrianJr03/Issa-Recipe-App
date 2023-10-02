@@ -38,9 +38,15 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
 
     private var initialized = false
 
-    suspend fun getChefGptResponse(userPrompt: String) {
+    suspend fun getChefGptResponse(
+        userPrompt: String,
+        context: String? = null
+    ) {
         _loading.emit(true)
-        val aiResponse = repository.getChatGptResponse(userPrompt = userPrompt)
+        val aiResponse = repository.getChatGptResponse(
+            userPrompt = userPrompt,
+            system = context
+        )
         _response.emit(aiResponse)
         _loading.emit(false)
     }

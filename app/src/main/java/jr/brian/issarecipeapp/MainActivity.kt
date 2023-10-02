@@ -124,6 +124,7 @@ fun AppUI(
             AskPage(
                 dao = dao,
                 storedApiKey = storedApiKey,
+                storedAskContext = storedAskContext,
                 onNavToAskContext = {
                     navController.navigate(ASK_CONTEXT_ROUTE) {
                         launchSingleTop = true

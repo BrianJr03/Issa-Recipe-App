@@ -27,7 +27,9 @@ import jr.brian.issarecipeapp.model.local.Chat
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import jr.brian.issarecipeapp.model.local.RecipeDao
+import jr.brian.issarecipeapp.util.API_KEY_REQUIRED
 import jr.brian.issarecipeapp.util.CHEF_GPT_LABEL
+import jr.brian.issarecipeapp.util.NO_RESPONSE_MSG
 import jr.brian.issarecipeapp.util.USER_LABEL
 import jr.brian.issarecipeapp.util.dateFormatter
 import jr.brian.issarecipeapp.util.getSpeechInputIntent
@@ -44,6 +46,7 @@ import jr.brian.issarecipeapp.viewmodel.MainViewModel
 fun AskPage(
     dao: RecipeDao,
     storedApiKey: String,
+    storedAskContext: String,
     viewModel: MainViewModel = hiltViewModel(),
     onNavToAskContext: () -> Unit
 ) {
@@ -91,7 +94,7 @@ fun AskPage(
         }
         if (storedApiKey.isEmpty()) {
             isSettingsDialogShowing.value = true
-            context.showToast("API Key is required", isLongToast = true)
+            context.showToast(API_KEY_REQUIRED)
         } else if (promptText.value.isEmpty() || promptText.value.isBlank()) {
             isEmptyPromptDialogShowing.value = true
         } else {
@@ -108,10 +111,10 @@ fun AskPage(
                 chats.add(myChat)
                 dao.insertChat(myChat)
                 chatListState.animateScrollToItem(chats.size)
-                viewModel.getChefGptResponse(userPrompt = prompt)
+                viewModel.getChefGptResponse(userPrompt = prompt, storedAskContext)
                 val chatGptChat = Chat(
                     fullTimeStamp = LocalDateTime.now().toString(),
-                    text = viewModel.response.value ?: "No response. Please try again.",
+                    text = viewModel.response.value ?: NO_RESPONSE_MSG,
                     dateSent = LocalDateTime.now().format(dateFormatter),
                     timeSent = LocalDateTime.now().format(timeFormatter),
                     senderLabel = CHEF_GPT_LABEL

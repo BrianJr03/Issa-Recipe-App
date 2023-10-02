@@ -15,6 +15,7 @@ interface ApiService {
     companion object {
         suspend fun getChatGptResponse(
             userPrompt: String,
+            system: String? = null
         ): String {
             var aiResponse: String
             try {
@@ -23,7 +24,8 @@ interface ApiService {
                     val request = ChatBot.ChatCompletionRequest(
                         model = GPT_3_5_TURBO,
                         systemContent = "You are a 5 star chef. " +
-                                "Only respond to questions that are about " +
+                                if (system.isNullOrBlank()) "" else "$system " +
+                                "\nLastly, only respond to questions that are about " +
                                 "preparing food, " +
                                 "cooking food, " +
                                 "providing recipes, " +
