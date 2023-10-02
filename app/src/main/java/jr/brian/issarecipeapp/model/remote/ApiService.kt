@@ -22,7 +22,14 @@ interface ApiService {
                     val key = ApiKey.userApiKey
                     val request = ChatBot.ChatCompletionRequest(
                         model = GPT_3_5_TURBO,
-                        systemContent = "You are a 5 star chef."
+                        systemContent = "You are a 5 star chef. " +
+                                "Only respond to questions that are about " +
+                                "preparing food, " +
+                                "cooking food, " +
+                                "providing recipes, " +
+                                "providing culinary advice, " +
+                                "or anything that generally has to do with any aspect of your job." +
+                                "Politely decline anything outside of that list."
                     )
                     val bot = CachedChatBot(
                         key,

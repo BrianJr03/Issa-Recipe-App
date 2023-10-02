@@ -1,5 +1,10 @@
 package jr.brian.issarecipeapp.util
 
+import android.content.Context
+import android.content.Intent
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -27,7 +32,9 @@ import jr.brian.issarecipeapp.view.ui.components.RejectedRecipeContentDialog
 import jr.brian.issarecipeapp.view.ui.components.RejectedRecipeHistoryDialog
 import jr.brian.issarecipeapp.view.ui.pages.RejectedRecipeCache
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import java.util.Locale
 
 val occasionOptions =
     listOf(
@@ -73,6 +80,9 @@ private val infoExamples =
 val randomInfo = infoExamples.random()
 val randomMealOccasion = occasionOptions.random()
 
+val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
+val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
+
 fun generateRecipeQuery(
     occasion: String,
     partySize: String,
@@ -91,7 +101,6 @@ fun generateRecipeQuery(
             "Lastly, here is some additional info for this recipe:" +
                     " $additionalInfo. Thanks!"
         else ""
-
 
 val customTextSelectionColors = TextSelectionColors(
     handleColor = BlueIsh,
@@ -183,4 +192,24 @@ fun SwipeHeaderLabel(dao: RecipeDao) {
             )
         }
     }
+}
+
+fun Context.showToast(text: String, isLongToast: Boolean = false) {
+    val duration = if (isLongToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
+    Toast.makeText(this, text, duration).show()
+}
+
+fun getSpeechInputIntent(context: Context): Intent? {
+    if (!SpeechRecognizer.isRecognitionAvailable(context)) {
+        Toast.makeText(context, "Speech not available", Toast.LENGTH_SHORT).show()
+    } else {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(
+            RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH
+        )
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak Now")
+        return intent
+    }
+    return null
 }

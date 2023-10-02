@@ -1,6 +1,8 @@
 package jr.brian.issarecipeapp.util
 
 const val HOME_ROUTE = "home"
+const val ASK_ROUTE = "ask"
+const val ASK_CONTEXT_ROUTE = "ask-context"
 const val MEAL_DETAILS_ROUTE = "meal-details"
 const val FAV_RECIPES_ROUTE = "fav-recipes"
 const val SWIPE_RECIPES_ROUTE = "swipe-recipes"
@@ -37,7 +39,16 @@ const val SWIPE_SCREEN_LABEL = "Love at first Swipe"
 
 const val GENERATE_API_KEY_URL = "https://platform.openai.com/account/api-keys"
 
-const val HOME_NAV_DELAY = 300L
-
 const val REJECTED_RECIPES_DIALOG_LABEL = "Rejected Recipes $SAD_FACE_EMOJI"
 const val NO_REJECTED_RECIPES_DIALOG_LABEL = "No Rejected Recipes $COOL_FACE_EMOJI"
+
+const val CHEF_GPT_LABEL = "ChefGPT"
+const val USER_LABEL = "Me"
+
+val copyToastMessages = listOf(
+    "Your copy is ready for pasta!",
+    "What are you waiting for? Paste!",
+    "Your clipboard has been blessed.",
+    "Chat copied!",
+    "Copied, the chat has been."
+)

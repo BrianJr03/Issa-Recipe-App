@@ -18,11 +18,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import jr.brian.issarecipeapp.model.local.AppDataStore
 import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.model.remote.ApiService
+import jr.brian.issarecipeapp.util.ASK_CONTEXT_ROUTE
+import jr.brian.issarecipeapp.util.ASK_ROUTE
 import jr.brian.issarecipeapp.util.SWIPE_RECIPES_ROUTE
 import jr.brian.issarecipeapp.util.FAV_RECIPES_ROUTE
 import jr.brian.issarecipeapp.util.HOME_ROUTE
 import jr.brian.issarecipeapp.util.MEAL_DETAILS_ROUTE
 import jr.brian.issarecipeapp.util.SETTINGS_ROUTE
+import jr.brian.issarecipeapp.view.ui.pages.AskContextPage
+import jr.brian.issarecipeapp.view.ui.pages.AskPage
 import jr.brian.issarecipeapp.view.ui.pages.FavRecipesPage
 import jr.brian.issarecipeapp.view.ui.pages.HomePage
 import jr.brian.issarecipeapp.view.ui.pages.GenerateRecipePage
@@ -56,6 +60,9 @@ class MainActivity : ComponentActivity() {
                     val foodAllergies =
                         dataStore.getFoodAllergies.collectAsState(initial = "none").value
                             ?: "none"
+                    val askContext =
+                        dataStore.getAskContext.collectAsState(initial = "").value
+                            ?: ""
 
                     ApiService.ApiKey.userApiKey = storedApiKey
 
@@ -65,6 +72,7 @@ class MainActivity : ComponentActivity() {
                             storedApiKey = storedApiKey,
                             storedDietaryRestrictions = dietaryRestrictions,
                             storedFoodAllergies = foodAllergies,
+                            storedAskContext = askContext,
                             dataStore = dataStore
                         )
                     }
@@ -80,12 +88,18 @@ fun AppUI(
     storedApiKey: String,
     storedDietaryRestrictions: String,
     storedFoodAllergies: String,
+    storedAskContext: String,
     dataStore: AppDataStore
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = HOME_ROUTE, builder = {
         composable(HOME_ROUTE, content = {
             HomePage(
+                onNavToAsk = {
+                    navController.navigate(ASK_ROUTE) {
+                        launchSingleTop = true
+                    }
+                },
                 onNavToMealDetails = {
                     navController.navigate(MEAL_DETAILS_ROUTE) {
                         launchSingleTop = true
@@ -105,6 +119,20 @@ fun AppUI(
                     }
                 }
             )
+        })
+        composable(ASK_ROUTE, content = {
+            AskPage(
+                dao = dao,
+                storedApiKey = storedApiKey,
+                onNavToAskContext = {
+                    navController.navigate(ASK_CONTEXT_ROUTE) {
+                        launchSingleTop = true
+                    }
+                }
+            )
+        })
+        composable(ASK_CONTEXT_ROUTE, content = {
+            AskContextPage(storedContext = storedAskContext, dataStore = dataStore)
         })
         composable(MEAL_DETAILS_ROUTE, content = {
             GenerateRecipePage(

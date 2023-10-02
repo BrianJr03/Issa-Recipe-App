@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -74,7 +76,7 @@ fun PresetOptionsDialog(
     ShowDialog(
         title = "Preset $title",
         content = {
-            LazyColumn() {
+            LazyColumn {
                 items(options.size) { index ->
                     val option = options[index]
                     Row(
@@ -330,7 +332,7 @@ fun RejectedRecipeHistoryDialog(
         title = if (recipes.isEmpty()) NO_REJECTED_RECIPES_DIALOG_LABEL
         else REJECTED_RECIPES_DIALOG_LABEL,
         content = {
-            LazyColumn() {
+            LazyColumn {
                 items(recipes.size) { index ->
                     val selectedRecipe = recipes.reversed()[index]
                     Row(
@@ -425,4 +427,72 @@ fun FolderContentDialog(
     onDelete: () -> Unit
 ) {
 
+}
+
+@Composable
+fun EmptyPromptDialog(
+    isShowing: MutableState<Boolean>,
+    modifier: Modifier = Modifier
+) {
+    ShowDialog(
+        title = "Please provide a prompt",
+        modifier = modifier,
+        content = {
+            Column {
+                Text(
+                    "The text field can not be empty.",
+                    fontSize = 16.sp,
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    isShowing.value = false
+                }) {
+                Text(text = "Dismiss", color = Color.White)
+            }
+        },
+        dismissButton = {},
+        isShowing = isShowing
+    )
+}
+
+@Composable
+fun DeleteDialog(
+    title: String,
+    isShowing: MutableState<Boolean>,
+    modifier: Modifier = Modifier,
+    onDeleteClick: () -> Unit
+) {
+    ShowDialog(
+        title = title,
+        modifier = modifier,
+        content = {
+            Column {
+                Text(
+                    "This can't be undone.",
+                    fontSize = 16.sp,
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onDeleteClick()
+                    isShowing.value = false
+                }) {
+                Text(text = "Delete", color = Color.White)
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    isShowing.value = false
+                }) {
+                Text(text = "Cancel", color = Color.White)
+            }
+        },
+        isShowing = isShowing
+    )
 }
