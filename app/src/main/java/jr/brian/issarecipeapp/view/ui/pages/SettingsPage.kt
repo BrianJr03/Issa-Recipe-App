@@ -199,7 +199,7 @@ fun Settings(
 
             DefaultTextField(
                 label = "Save $DIETARY_RESTRICTIONS_LABEL",
-                value = dietaryRestrictions,
+                value = dietaryRestrictions.value,
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = onDietaryValueChange,
                 trailingIcon = {
@@ -218,7 +218,7 @@ fun Settings(
 
             DefaultTextField(
                 label = "Save $FOOD_ALLERGY_LABEL",
-                value = foodAllergies,
+                value = foodAllergies.value,
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = onAllergiesValueChange,
                 trailingIcon = {
@@ -239,10 +239,9 @@ fun Settings(
 
             DefaultTextField(
                 label = API_KEY_LABEL,
-                value = apiKey,
+                value = apiKey.value,
                 onValueChange = onApiKeyValueChange,
                 modifier = Modifier.fillMaxWidth(),
-                isShowingErrorColor = showErrorColorAPiKey
             )
 
             Button(

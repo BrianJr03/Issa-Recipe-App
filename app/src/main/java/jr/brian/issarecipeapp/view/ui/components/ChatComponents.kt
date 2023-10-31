@@ -1,6 +1,5 @@
 package jr.brian.issarecipeapp.view.ui.components
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
@@ -24,46 +23,35 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarResult
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ClipboardManager
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.Chat
-import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.util.CHEF_GPT_LABEL
-import jr.brian.issarecipeapp.util.copyToastMessages
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
-import kotlinx.coroutines.launch
+import jr.brian.issarecipeapp.viewmodel.MainViewModel
 
 @Composable
 fun ChatHeader(
-    isChatGptTyping: MutableState<Boolean>,
+    isChatGptTyping: Boolean,
     modifier: Modifier = Modifier,
     headerTextModifier: Modifier = Modifier,
     onResetAllChats: () -> Unit,
@@ -83,7 +71,7 @@ fun ChatHeader(
         horizontalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
-        if (isChatGptTyping.value) {
+        if (isChatGptTyping) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -96,10 +84,10 @@ fun ChatHeader(
                         fontSize = 18.sp
                     )
                 )
-                LottieLoading(
-                    isShowing = isChatGptTyping,
-                    modifier = Modifier.size(40.dp)
-                )
+//                LottieLoading(
+//                    isShowing = isChatGptTyping,
+//                    modifier = Modifier.size(40.dp)
+//                )
                 Spacer(modifier = Modifier.weight(.1f))
             }
         }
@@ -150,17 +138,13 @@ fun ChatHeader(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatSection(
-    dao: RecipeDao,
-    chats: MutableList<Chat>,
+    chats: List<Chat>,
     listState: LazyListState,
-    scaffoldState: ScaffoldState,
-    isChefGptTyping: State<Boolean>,
+    viewModel: MainViewModel,
     modifier: Modifier = Modifier,
+    onDeleteChat: (chat: Chat) -> Unit
 ) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val focusManager = LocalFocusManager.current
-    val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    val isChatGptTyping = viewModel.loading.collectAsState()
     val interactionSource = remember { MutableInteractionSource() }
 
     if (chats.isEmpty()) {
@@ -184,7 +168,7 @@ fun ChatSection(
 
             val isShowingLoadingBar = remember {
                 derivedStateOf {
-                    (isChefGptTyping.value && index == chats.size - 1)
+                    (isChatGptTyping.value && index == chats.size - 1)
                 }
             }
 
@@ -192,9 +176,7 @@ fun ChatSection(
                 title = "Delete this Chat?",
                 isShowing = isDeleteDialogShowing,
             ) {
-                chats.remove(chat)
-                dao.removeChat(chat)
-                scope.launch { scaffoldState.drawerState.close() }
+                onDeleteChat(chat)
             }
 
             ChatBox(
@@ -203,7 +185,7 @@ fun ChatSection(
                 timeSent = chat.timeSent,
                 senderLabel = chat.senderLabel,
                 isHumanChatBox = isHumanChatBox,
-                isChefGptTyping = isShowingLoadingBar,
+                isChefGptTyping = isShowingLoadingBar.value,
                 modifier = Modifier
                     .padding(10.dp)
                     .indication(interactionSource, LocalIndication.current)
@@ -211,27 +193,7 @@ fun ChatSection(
                 onDeleteChat = {
                     isDeleteDialogShowing.value = true
                 }
-            ) {
-                scope.launch {
-                    val snackResult = scaffoldState.snackbarHostState.showSnackbar(
-                        message = "Copy all text?",
-                        actionLabel = "Yes",
-                        duration = SnackbarDuration.Short
-                    )
-                    when (snackResult) {
-                        SnackbarResult.Dismissed -> {}
-                        SnackbarResult.ActionPerformed -> {
-                            clipboardManager.setText(AnnotatedString((chat.text)))
-                            Toast.makeText(
-                                context,
-                                copyToastMessages.random(),
-                                Toast.LENGTH_LONG
-                            ).show()
-                            focusManager.clearFocus()
-                        }
-                    }
-                }
-            }
+            )
         }
     }
 }
@@ -244,10 +206,9 @@ private fun ChatBox(
     timeSent: String,
     senderLabel: String,
     isHumanChatBox: Boolean,
-    isChefGptTyping: State<Boolean>,
+    isChefGptTyping: Boolean,
     modifier: Modifier = Modifier,
-    onDeleteChat: () -> Unit,
-    onLongCLick: () -> Unit,
+    onDeleteChat: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val isChatInfoShowing = remember { mutableStateOf(false) }
@@ -302,7 +263,7 @@ private fun ChatBox(
                 }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (isChefGptTyping.value) {
+                if (isChefGptTyping) {
                     CircularProgressIndicator(
                         color = BlueIsh,
                         modifier = Modifier.size(30.dp)
@@ -317,8 +278,7 @@ private fun ChatBox(
                             onClick = {
                                 focusManager.clearFocus()
                                 isChatInfoShowing.value = !isChatInfoShowing.value
-                            },
-                            onLongClick = { onLongCLick() },
+                            }
                         )
                 ) {
                     CompositionLocalProvider {

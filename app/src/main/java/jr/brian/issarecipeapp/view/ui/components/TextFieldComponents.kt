@@ -9,7 +9,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -22,31 +23,32 @@ import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 @Composable
 fun DefaultTextField(
     label: String,
-    value: MutableState<String>,
+    value: String,
     modifier: Modifier = Modifier,
     maxCount: Int = Int.MAX_VALUE,
-    onValueChange: ((String) -> Unit)? = null,
+    onValueChange: ((str: String) -> Unit)? = null,
     onDone: (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    isShowingErrorColor: MutableState<Boolean>? = null,
+    trailingIcon: @Composable (() -> Unit)? = null
 ) {
+    val showErrorColor = remember {
+        mutableStateOf(false)
+    }
     OutlinedTextField(
         modifier = modifier.padding(
             start = 15.dp,
             end = 15.dp,
             bottom = 15.dp
         ),
-        value = value.value,
+        value = value,
         onValueChange = { str ->
             if (str.length <= maxCount) {
-                value.value = str
                 if (str.isNotBlank()) {
-                    isShowingErrorColor?.value = false
+                    showErrorColor.value = false
                 } else if (str.toIntOrNull() != null) {
-                    isShowingErrorColor?.value = false
+                    showErrorColor.value = false
                 }
             }
-            onValueChange?.invoke(value.value)
+            onValueChange?.invoke(str)
         },
         label = {
             Text(
@@ -58,8 +60,8 @@ fun DefaultTextField(
             )
         },
         colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = if (isShowingErrorColor?.value == true) Color.Red else BlueIsh,
-            unfocusedIndicatorColor = if (isShowingErrorColor?.value == true) Color.Red
+            focusedIndicatorColor = if (showErrorColor.value) Color.Red else BlueIsh,
+            unfocusedIndicatorColor = if (showErrorColor.value) Color.Red
             else MaterialTheme.colorScheme.background
         ),
         trailingIcon = trailingIcon,

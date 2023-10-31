@@ -110,17 +110,21 @@ fun PresetOptionsDialog(
 @Composable
 fun RecipeNameDialog(
     isShowing: MutableState<Boolean>,
-    isShowingErrorColor: MutableState<Boolean>,
-    name: MutableState<String>,
+    name: String,
     onConfirmClick: () -> Unit
 ) {
+    val nameString = remember {
+        mutableStateOf(name)
+    }
     ShowDialog(
         title = "Name this Recipe",
         content = {
             DefaultTextField(
                 label = "name",
-                value = name,
-                isShowingErrorColor = isShowingErrorColor,
+                value = nameString.value,
+                onValueChange = {
+                    nameString.value = it
+                },
                 maxCount = RECIPE_NAME_MAX_CHAR_COUNT
             )
         },
@@ -133,8 +137,7 @@ fun RecipeNameDialog(
         },
         dismissButton = {
             Button(onClick = {
-                name.value = ""
-                isShowingErrorColor.value = false
+                nameString.value = ""
                 isShowing.value = false
             }) {
                 Text(text = "Cancel")
@@ -252,8 +255,7 @@ fun RecipeContentDialog(
                     AnimatedVisibility(visible = isRenameFieldShowing.value) {
                         DefaultTextField(
                             label = "Rename Recipe",
-                            value = newRecipeName,
-                            isShowingErrorColor = showTextFieldErrorColor,
+                            value = newRecipeName.value,
                             maxCount = RECIPE_NAME_MAX_CHAR_COUNT
                         )
                     }

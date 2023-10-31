@@ -43,7 +43,7 @@ fun AskContextPage(
             ) {
                 items(1) {
                     DefaultTextField(
-                        value = conversationalContextText,
+                        value = conversationalContextText.value,
                         onValueChange = { text ->
                             conversationalContextText.value = text
                             scope.launch {

@@ -309,14 +309,16 @@ fun MealDetails(
             ) {
                 DefaultTextField(
                     label = PARTY_SIZE_LABEL,
-                    value = partySize,
+                    value = partySize.value,
+                    onValueChange = {
+                        partySize.value = it
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged {
                             isPartySizeFocused.value = it.isFocused
                         },
                     maxCount = PARTY_SIZE_MAX_CHAR_COUNT,
-                    isShowingErrorColor = showErrorColorPartySize,
                     onDone = {
                         focusManager.clearFocus()
                     }
@@ -333,13 +335,15 @@ fun MealDetails(
             ) {
                 DefaultTextField(
                     label = INGREDIENTS_LABEL,
-                    value = ingredients,
+                    value = ingredients.value,
+                    onValueChange = {
+                      ingredients.value = it
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged {
                             isIngredientsFocused.value = it.isFocused
                         },
-                    isShowingErrorColor = showErrorColorIngredients,
                     onDone = {
                         focusManager.clearFocus()
                     }
@@ -356,7 +360,10 @@ fun MealDetails(
             ) {
                 DefaultTextField(
                     label = "Occasion | Ex: $randomMealOccasion",
-                    value = occasion,
+                    value = occasion.value,
+                    onValueChange = {
+                        occasion.value = it
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged {
@@ -391,7 +398,10 @@ fun MealDetails(
             ) {
                 DefaultTextField(
                     label = DIETARY_RESTRICTIONS_LABEL,
-                    value = dietaryRestrictions,
+                    value = dietaryRestrictions.value,
+                    onValueChange = {
+                        dietaryRestrictions.value = it
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged {
@@ -426,7 +436,10 @@ fun MealDetails(
             ) {
                 DefaultTextField(
                     label = FOOD_ALLERGY_LABEL,
-                    value = foodAllergies,
+                    value = foodAllergies.value,
+                    onValueChange = {
+                        foodAllergies.value = it
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged {
@@ -461,7 +474,10 @@ fun MealDetails(
             ) {
                 DefaultTextField(
                     label = "Other Info | Ex: $randomInfo",
-                    value = additionalInfo,
+                    value = additionalInfo.value,
+                    onValueChange = {
+                        additionalInfo.value = it
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged {
@@ -662,8 +678,7 @@ fun RecipeResults(
 
     RecipeNameDialog(
         isShowing = isShowingSaveNameDialog,
-        name = name,
-        isShowingErrorColor = isShowingSaveNameError
+        name = name.value,
     ) {
         if (name.value.isNotBlank()) {
             dao.insertRecipe(Recipe(generatedRecipe.value, name.value))

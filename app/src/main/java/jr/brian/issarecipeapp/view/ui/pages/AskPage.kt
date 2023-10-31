@@ -12,7 +12,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
@@ -52,7 +51,6 @@ fun AskPage(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val scaffoldState = rememberScaffoldState()
     val focusManager = LocalFocusManager.current
 
     val promptText = remember { mutableStateOf("") }
@@ -67,8 +65,6 @@ fun AskPage(
 
     val scrollState = rememberScrollState()
     val chatListState = rememberLazyListState()
-
-    val isLoading = viewModel.loading.collectAsState()
 
     LaunchedEffect(key1 = 1, block = {
         chatListState.animateScrollToItem(chats.size)
@@ -141,7 +137,7 @@ fun AskPage(
             Spacer(Modifier.height(5.dp))
 
             ChatHeader(
-                isChatGptTyping = isChatGptTyping,
+                isChatGptTyping = isChatGptTyping.value,
                 modifier = Modifier.padding(5.dp),
                 onResetAllChats = {
                     chats.clear()
@@ -159,11 +155,9 @@ fun AskPage(
             )
 
             ChatSection(
-                dao = dao,
                 chats = chats,
                 listState = chatListState,
-                scaffoldState = scaffoldState,
-                isChefGptTyping = isLoading,
+                viewModel = viewModel,
                 modifier = Modifier
                     .weight(.90f)
                     .clickable(
@@ -171,7 +165,10 @@ fun AskPage(
                     ) {
                         focusManager.clearFocus()
                     }
-            )
+            ) { chat ->
+                chats.remove(chat)
+                dao.removeChat(chat)
+            }
 
             ChatTextFieldRow(
                 promptText = promptText.value,

@@ -184,7 +184,7 @@ fun RecipeGrid(
     ) {
         DefaultTextField(
             label = "Search Recipes",
-            value = recipeQuery,
+            value = recipeQuery.value,
             modifier = Modifier.padding(top = 15.dp)
         )
 
@@ -265,7 +265,7 @@ fun FoldersGrid(
     ) {
         DefaultTextField(
             label = "Search Folders",
-            value = folderQuery,
+            value = folderQuery.value,
             modifier = Modifier.padding(top = 15.dp)
         )
 
