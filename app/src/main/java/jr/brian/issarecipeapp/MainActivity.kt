@@ -138,6 +138,7 @@ fun AppUI(
         composable(MEAL_DETAILS_ROUTE, content = {
             GenerateRecipePage(
                 dao = dao,
+                dataStore = dataStore,
                 dietaryRestrictions = storedDietaryRestrictions,
                 foodAllergies = storedFoodAllergies,
             ) {

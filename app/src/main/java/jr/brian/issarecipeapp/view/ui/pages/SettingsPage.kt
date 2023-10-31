@@ -110,19 +110,22 @@ fun SettingsPage(
             apiKey = key,
             dietaryRestrictions = dietary,
             foodAllergies = allergies,
-            onApiKeyValueChange = {
+            onApiKeyValueChange = { str ->
+                key.value = str
                 scope.launch {
-                    dataStore.saveApiKey(it)
+                    dataStore.saveApiKey(str)
                 }
             },
-            onDietaryValueChange = {
+            onDietaryValueChange = { str ->
+                dietary.value = str
                 scope.launch {
-                    dataStore.saveDietaryRestrictions(it.lowercase())
+                    dataStore.saveDietaryRestrictions(str.lowercase())
                 }
             },
-            onAllergiesValueChange = {
+            onAllergiesValueChange = { str ->
+                allergies.value = str
                 scope.launch {
-                    dataStore.saveFoodAllergies(it.lowercase())
+                    dataStore.saveFoodAllergies(str.lowercase())
                 }
             },
             modifier = Modifier
@@ -151,10 +154,6 @@ fun Settings(
     val focusManager = LocalFocusManager.current
 
     val scope = rememberCoroutineScope()
-
-    val showErrorColorAPiKey = remember {
-        mutableStateOf(false)
-    }
 
     val isDietaryOptionsShowing = remember {
         mutableStateOf(false)

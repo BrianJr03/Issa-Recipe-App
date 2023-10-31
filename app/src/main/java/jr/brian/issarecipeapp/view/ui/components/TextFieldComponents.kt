@@ -9,6 +9,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ fun DefaultTextField(
     value: String,
     modifier: Modifier = Modifier,
     maxCount: Int = Int.MAX_VALUE,
+    isError: MutableState<Boolean> = mutableStateOf(false),
     onValueChange: ((str: String) -> Unit)? = null,
     onDone: (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null
@@ -40,6 +42,7 @@ fun DefaultTextField(
             bottom = 15.dp
         ),
         value = value,
+        isError = isError.value,
         onValueChange = { str ->
             if (str.length <= maxCount) {
                 if (str.isNotBlank()) {

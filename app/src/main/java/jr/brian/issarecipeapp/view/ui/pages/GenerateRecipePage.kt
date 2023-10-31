@@ -50,6 +50,7 @@ import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import jr.brian.issarecipeapp.R
+import jr.brian.issarecipeapp.model.local.AppDataStore
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.model.remote.ApiService
@@ -83,6 +84,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun GenerateRecipePage(
     dao: RecipeDao,
+    dataStore: AppDataStore,
     dietaryRestrictions: String,
     foodAllergies: String,
     viewModel: MainViewModel = hiltViewModel(),
@@ -168,6 +170,7 @@ fun GenerateRecipePage(
                     when (currentPageIndex) {
                         0 -> {
                             MealDetails(
+                                dataStore = dataStore,
                                 occasion = mealType,
                                 partySize = servingSize,
                                 dietaryRestrictions = dietary,
@@ -217,6 +220,7 @@ fun GenerateRecipePage(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MealDetails(
+    dataStore: AppDataStore,
     occasion: MutableState<String>,
     partySize: MutableState<String>,
     dietaryRestrictions: MutableState<String>,
@@ -284,6 +288,9 @@ fun MealDetails(
         options = dietaryOptions,
         onSelectItem = {
             dietaryRestrictions.value = it
+            scope.launch {
+                dataStore.saveDietaryRestrictions(it)
+            }
         })
 
     PresetOptionsDialog(
@@ -292,6 +299,9 @@ fun MealDetails(
         options = allergyOptions,
         onSelectItem = {
             foodAllergies.value = it
+            scope.launch {
+                dataStore.saveFoodAllergies(it)
+            }
         })
 
     LazyColumn(
@@ -313,6 +323,7 @@ fun MealDetails(
                     onValueChange = {
                         partySize.value = it
                     },
+                    isError = showErrorColorPartySize,
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged {
@@ -337,8 +348,9 @@ fun MealDetails(
                     label = INGREDIENTS_LABEL,
                     value = ingredients.value,
                     onValueChange = {
-                      ingredients.value = it
+                        ingredients.value = it
                     },
+                    isError = showErrorColorIngredients,
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged {
@@ -401,6 +413,9 @@ fun MealDetails(
                     value = dietaryRestrictions.value,
                     onValueChange = {
                         dietaryRestrictions.value = it
+                        scope.launch {
+                            dataStore.saveDietaryRestrictions(it)
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -413,7 +428,6 @@ fun MealDetails(
                             tint = BlueIsh,
                             contentDescription = "View preset dietary restrictions",
                             modifier = Modifier.clickable {
-                                focusManager.clearFocus()
                                 isOccasionOptionsShowing.value = false
                                 isAllergyOptionsShowing.value = false
                                 isDietaryOptionsShowing.value = !isDietaryOptionsShowing.value
@@ -439,6 +453,9 @@ fun MealDetails(
                     value = foodAllergies.value,
                     onValueChange = {
                         foodAllergies.value = it
+                        scope.launch {
+                            dataStore.saveFoodAllergies(it)
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -451,7 +468,6 @@ fun MealDetails(
                             tint = BlueIsh,
                             contentDescription = "View preset food allergies",
                             modifier = Modifier.clickable {
-                                focusManager.clearFocus()
                                 isDietaryOptionsShowing.value = false
                                 isOccasionOptionsShowing.value = false
                                 isAllergyOptionsShowing.value = !isAllergyOptionsShowing.value
@@ -489,74 +505,69 @@ fun MealDetails(
                 )
             }
 
-            AnimatedVisibility(
-                visible = isGenerateBtnShowing.value &&
-                        !isIngredientsFocused.value &&
-                        !isOccasionFocused.value &&
-                        !isDietaryFocused.value &&
-                        !isAllergiesFocused.value &&
-                        !isPartySizeFocused.value &&
-                        !isOtherFocused.value
-            ) {
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            start = 15.dp,
-                            end = 15.dp
-                        ),
-                    onClick = {
-                        if (ApiService.ApiKey.userApiKey.isBlank()) {
-                            context.showToast(API_KEY_REQUIRED)
-                            onNavToSettings()
-                        } else if (ingredients.value.isBlank()) {
-                            showErrorColorIngredients.value = true
-                        } else if (partySize.value.toIntOrNull() == null) {
-                            showErrorColorPartySize.value = true
-                        } else if (!loading.value) {
-                            scope.launch {
-                                delay(300)
-                                isRandomBtnShowing.value = false
-                            }
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 15.dp,
+                        end = 15.dp
+                    ),
+                onClick = {
+                    focusManager.clearFocus()
+                    if (ApiService.ApiKey.userApiKey.isBlank()) {
+                        context.showToast(API_KEY_REQUIRED)
+                        onNavToSettings()
+                    } else if (ingredients.value.isBlank()) {
+                        showErrorColorIngredients.value = true
+                    } else if (partySize.value.toIntOrNull() == null) {
+                        showErrorColorPartySize.value = true
+                    } else if (!loading.value) {
+                        showErrorColorIngredients.value = false
+                        showErrorColorPartySize.value = false
 
-                            occasion.value = occasion.value.ifBlankUse("any occasion")
-                            dietaryRestrictions.value =
-                                dietaryRestrictions.value.ifBlankUse("none")
-                            foodAllergies.value = foodAllergies.value.ifBlankUse("none")
-
-                            val query = generateRecipeQuery(
-                                occasion = occasion.value,
-                                partySize = partySize.value,
-                                dietaryRestrictions = dietaryRestrictions.value,
-                                foodAllergies = foodAllergies.value,
-                                ingredients = ingredients.value,
-                                additionalInfo = additionalInfo.value,
-                            )
-
-                            focusManager.clearFocus()
-
-                            scope.launch {
-                                generatedRecipe.value = ""
-                                viewModel.getChefGptResponse(userPrompt = query)
-                                generatedRecipe.value =
-                                    viewModel.response.value ?: NO_RESPONSE_MSG
-                                pagerState.animateScrollToPage(1)
-                            }
-
-                            hasBeenSaved.value = false
+                        scope.launch {
+                            delay(300)
+                            isRandomBtnShowing.value = false
                         }
-                    }) {
 
-                    if (loading.value) {
-                        CircularProgressIndicator(
-                            color = Color.White,
-                            modifier = Modifier.size(20.dp)
+                        occasion.value = occasion.value.ifBlankUse("any occasion")
+                        dietaryRestrictions.value =
+                            dietaryRestrictions.value.ifBlankUse("none")
+                        foodAllergies.value = foodAllergies.value.ifBlankUse("none")
+
+                        val query = generateRecipeQuery(
+                            occasion = occasion.value,
+                            partySize = partySize.value,
+                            dietaryRestrictions = dietaryRestrictions.value,
+                            foodAllergies = foodAllergies.value,
+                            ingredients = ingredients.value,
+                            additionalInfo = additionalInfo.value,
                         )
-                    } else {
-                        Text("Generate Recipe")
+
+                        focusManager.clearFocus()
+
+                        scope.launch {
+                            generatedRecipe.value = ""
+                            viewModel.getChefGptResponse(userPrompt = query)
+                            generatedRecipe.value =
+                                viewModel.response.value ?: NO_RESPONSE_MSG
+                            pagerState.animateScrollToPage(1)
+                        }
+
+                        hasBeenSaved.value = false
                     }
+                }) {
+
+                if (loading.value) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                } else {
+                    Text("Generate Recipe")
                 }
             }
+
 
             Spacer(modifier = Modifier.height(10.dp))
 
