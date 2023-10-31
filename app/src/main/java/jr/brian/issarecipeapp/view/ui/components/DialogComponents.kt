@@ -111,7 +111,7 @@ fun PresetOptionsDialog(
 fun RecipeNameDialog(
     isShowing: MutableState<Boolean>,
     name: String,
-    onConfirmClick: () -> Unit
+    onConfirmClick: (String) -> Unit
 ) {
     val nameString = remember {
         mutableStateOf(name)
@@ -130,7 +130,7 @@ fun RecipeNameDialog(
         },
         confirmButton = {
             Button(onClick = {
-                onConfirmClick()
+                onConfirmClick(nameString.value)
             }) {
                 Text(text = "Save")
             }
@@ -256,6 +256,9 @@ fun RecipeContentDialog(
                         DefaultTextField(
                             label = "Rename Recipe",
                             value = newRecipeName.value,
+                            onValueChange = {
+                                newRecipeName.value = it
+                            },
                             maxCount = RECIPE_NAME_MAX_CHAR_COUNT
                         )
                     }

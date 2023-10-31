@@ -28,7 +28,7 @@ fun DefaultTextField(
     modifier: Modifier = Modifier,
     maxCount: Int = Int.MAX_VALUE,
     isError: MutableState<Boolean> = mutableStateOf(false),
-    onValueChange: ((str: String) -> Unit)? = null,
+    onValueChange: ((str: String) -> Unit)?,
     onDone: (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null
 ) {

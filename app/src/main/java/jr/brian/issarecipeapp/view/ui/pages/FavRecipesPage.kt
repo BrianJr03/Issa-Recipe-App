@@ -185,6 +185,9 @@ fun RecipeGrid(
         DefaultTextField(
             label = "Search Recipes",
             value = recipeQuery.value,
+            onValueChange = {
+                recipeQuery.value = it
+            },
             modifier = Modifier.padding(top = 15.dp)
         )
 
@@ -266,6 +269,9 @@ fun FoldersGrid(
         DefaultTextField(
             label = "Search Folders",
             value = folderQuery.value,
+            onValueChange = {
+                folderQuery.value = it
+            },
             modifier = Modifier.padding(top = 15.dp)
         )
 
@@ -329,22 +335,22 @@ fun RecipeBox(
         }
     }
 
-        Box(modifier = modifier
-            .padding(16.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(BlueIsh)
-            .clickable {
-                isShowingRecipe.value = !isShowingRecipe.value
-            }) {
-            Text(
-                text = recipe.name,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
-                textAlign = TextAlign.Center,
-                fontSize = 20.sp
-            )
+    Box(modifier = modifier
+        .padding(16.dp)
+        .clip(RoundedCornerShape(10.dp))
+        .background(BlueIsh)
+        .clickable {
+            isShowingRecipe.value = !isShowingRecipe.value
+        }) {
+        Text(
+            text = recipe.name,
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            textAlign = TextAlign.Center,
+            fontSize = 20.sp
+        )
 
     }
 }

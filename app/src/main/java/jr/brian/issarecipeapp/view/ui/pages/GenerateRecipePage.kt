@@ -691,8 +691,8 @@ fun RecipeResults(
         isShowing = isShowingSaveNameDialog,
         name = name.value,
     ) {
-        if (name.value.isNotBlank()) {
-            dao.insertRecipe(Recipe(generatedRecipe.value, name.value))
+        if (it.isNotBlank()) {
+            dao.insertRecipe(Recipe(generatedRecipe.value, it))
             isShowingSavedSuccess.value = true
             isShowingSaveNameDialog.value = false
             name.value = ""

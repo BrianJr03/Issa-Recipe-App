@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -45,100 +46,102 @@ fun HomePage(
     Scaffold {
         Spacer(modifier = Modifier.height(15.dp))
 
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                fontSize = 20.sp,
-                color = BlueIsh,
-                text = stringResource(id = R.string.app_name),
-            )
+            item {
+                Text(
+                    fontSize = 20.sp,
+                    color = BlueIsh,
+                    text = stringResource(id = R.string.app_name),
+                )
 
-            Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-            LottieRecipe(
-                isShowing = remember {
-                    mutableStateOf(true)
-                }, modifier = Modifier.size(250.dp)
-            )
+                LottieRecipe(
+                    isShowing = remember {
+                        mutableStateOf(true)
+                    }, modifier = Modifier.size(250.dp)
+                )
 
-            AnimatedVisibility(visible = isMenuShowing.value) {
-                Column(
-                    modifier = Modifier
-                        .padding(it),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        fontSize = 30.sp,
-                        color = BlueIsh,
-                        text = "Ask",
-                        modifier = Modifier.clickable {
-                            isMenuShowing.value = false
-                            scope.launch {
-                                onNavToAsk()
+                AnimatedVisibility(visible = isMenuShowing.value) {
+                    Column(
+                        modifier = Modifier
+                            .padding(it),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            fontSize = 30.sp,
+                            color = BlueIsh,
+                            text = "Ask",
+                            modifier = Modifier.clickable {
+                                isMenuShowing.value = false
+                                scope.launch {
+                                    onNavToAsk()
+                                }
                             }
-                        }
-                    )
+                        )
 
-                    Spacer(modifier = Modifier.height(25.dp))
+                        Spacer(modifier = Modifier.height(25.dp))
 
-                    Text(
-                        fontSize = 30.sp,
-                        color = BlueIsh,
-                        text = "Swipe",
-                        modifier = Modifier.clickable {
-                            isMenuShowing.value = false
-                            scope.launch {
-                                onNavToSwipe()
+                        Text(
+                            fontSize = 30.sp,
+                            color = BlueIsh,
+                            text = "Swipe",
+                            modifier = Modifier.clickable {
+                                isMenuShowing.value = false
+                                scope.launch {
+                                    onNavToSwipe()
+                                }
                             }
-                        }
-                    )
+                        )
 
-                    Spacer(modifier = Modifier.height(25.dp))
+                        Spacer(modifier = Modifier.height(25.dp))
 
-                    Text(
-                        fontSize = 30.sp,
-                        color = BlueIsh,
-                        text = "Generate",
-                        modifier = Modifier.clickable {
-                            isMenuShowing.value = false
-                            scope.launch {
-                                onNavToMealDetails()
+                        Text(
+                            fontSize = 30.sp,
+                            color = BlueIsh,
+                            text = "Generate",
+                            modifier = Modifier.clickable {
+                                isMenuShowing.value = false
+                                scope.launch {
+                                    onNavToMealDetails()
+                                }
+                            })
+
+                        Spacer(modifier = Modifier.height(25.dp))
+
+                        Text(
+                            fontSize = 30.sp,
+                            color = BlueIsh,
+                            text = "Favorites",
+                            modifier = Modifier.clickable {
+                                isMenuShowing.value = false
+                                scope.launch {
+                                    onNavToFavRecipes()
+                                }
                             }
-                        })
+                        )
 
-                    Spacer(modifier = Modifier.height(25.dp))
+                        Spacer(modifier = Modifier.height(25.dp))
 
-                    Text(
-                        fontSize = 30.sp,
-                        color = BlueIsh,
-                        text = "Favorites",
-                        modifier = Modifier.clickable {
-                            isMenuShowing.value = false
-                            scope.launch {
-                                onNavToFavRecipes()
+                        Text(
+                            fontSize = 30.sp,
+                            color = BlueIsh,
+                            text = "Settings",
+                            modifier = Modifier.clickable {
+                                isMenuShowing.value = false
+                                scope.launch {
+                                    onNavToSettings()
+                                }
                             }
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(25.dp))
-
-                    Text(
-                        fontSize = 30.sp,
-                        color = BlueIsh,
-                        text = "Settings",
-                        modifier = Modifier.clickable {
-                            isMenuShowing.value = false
-                            scope.launch {
-                                onNavToSettings()
-                            }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
