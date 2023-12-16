@@ -27,7 +27,7 @@ interface ApiService {
                 return TITLE_IS_REQUIRED
             } else {
                 val ingredientsQuery = if (ingredients.isNullOrBlank()) ""
-                else "Please include $ingredients"
+                else "Please include $ingredients."
                 withContext(Dispatchers.IO) {
                     val openAIImageClient = OpenAIImageClient(apiKey = ApiKey.userApiKey)
                     val imageGenerationRequest = OpenAIImageClient.ImageGenerationRequest(

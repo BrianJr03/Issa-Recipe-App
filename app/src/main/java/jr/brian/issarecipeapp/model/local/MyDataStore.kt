@@ -18,6 +18,7 @@ class AppDataStore @Inject constructor(private val context: Context) {
         val DIETARY_RESTRICTIONS = stringPreferencesKey("dietary-restrictions")
         val FOOD_ALLERGIES = stringPreferencesKey("food-allergies")
         val ASK_CONTEXT = stringPreferencesKey("ask-context")
+        val IS_IMAGE_GENERATION_ENABLED = stringPreferencesKey("is-image-generation-enabled")
     }
 
     val getApiKey: Flow<String?> = context.dataStore.data.map { preferences ->
@@ -37,6 +38,16 @@ class AppDataStore @Inject constructor(private val context: Context) {
     suspend fun saveAskContext(askContext: String) {
         context.dataStore.edit { preferences ->
             preferences[ASK_CONTEXT] = askContext
+        }
+    }
+
+    val getIsImageGenerationEnabled: Flow<String?> = context.dataStore.data.map { preferences ->
+        preferences[IS_IMAGE_GENERATION_ENABLED]
+    }
+
+    suspend fun saveIsImageGenerationEnabled(isEnabled: String) {
+        context.dataStore.edit { preferences ->
+            preferences[IS_IMAGE_GENERATION_ENABLED] = isEnabled
         }
     }
 

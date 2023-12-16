@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -41,6 +43,7 @@ import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.AppDataStore
 import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.util.API_KEY_LABEL
+import jr.brian.issarecipeapp.util.API_USAGE_URL
 import jr.brian.issarecipeapp.util.DIETARY_RESTRICTIONS_LABEL
 import jr.brian.issarecipeapp.util.FOOD_ALLERGY_LABEL
 import jr.brian.issarecipeapp.util.GENERATE_API_KEY_URL
@@ -59,6 +62,7 @@ fun SettingsPage(
     apiKey: String,
     dietaryRestrictions: String,
     foodAllergies: String,
+    isImageGenerationEnabled: String,
     dataStore: AppDataStore
 ) {
     val scope = rememberCoroutineScope()
@@ -73,6 +77,10 @@ fun SettingsPage(
 
     val allergies = remember {
         mutableStateOf(foodAllergies)
+    }
+
+    val isImageGenEnabled = remember {
+        mutableStateOf(isImageGenerationEnabled)
     }
 
     val pagerState = rememberPagerState()
@@ -110,6 +118,7 @@ fun SettingsPage(
             apiKey = key,
             dietaryRestrictions = dietary,
             foodAllergies = allergies,
+            isImageGenEnabled = isImageGenEnabled,
             onApiKeyValueChange = { str ->
                 key.value = str
                 scope.launch {
@@ -128,6 +137,11 @@ fun SettingsPage(
                     dataStore.saveFoodAllergies(str.lowercase())
                 }
             },
+            onEnableImageGenCheckChange = { isChecked ->
+                scope.launch {
+                    dataStore.saveIsImageGenerationEnabled(isChecked.toString())
+                }
+            },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
@@ -144,10 +158,12 @@ fun Settings(
     dao: RecipeDao,
     apiKey: MutableState<String>,
     dietaryRestrictions: MutableState<String>,
+    isImageGenEnabled: MutableState<String>,
     foodAllergies: MutableState<String>,
     onApiKeyValueChange: (String) -> Unit,
     onDietaryValueChange: (String) -> Unit,
     onAllergiesValueChange: (String) -> Unit,
+    onEnableImageGenCheckChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -169,6 +185,10 @@ fun Settings(
 
     val deleteLabel = remember {
         mutableStateOf("Clear All Favorites")
+    }
+
+    val switchedCheckedState = remember {
+        mutableStateOf(isImageGenEnabled.value.toBoolean())
     }
 
     PresetOptionsDialog(
@@ -243,6 +263,39 @@ fun Settings(
                 modifier = Modifier.fillMaxWidth(),
             )
 
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Switch(
+                    checked = switchedCheckedState.value,
+                    onCheckedChange = { isChecked ->
+                        switchedCheckedState.value = isChecked
+                        onEnableImageGenCheckChange(isChecked)
+                    },
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                Column {
+                    Text(
+                        text = "Enable Image Generation", style = TextStyle(
+                            color = BlueIsh,
+                            fontSize = 20.sp
+                        )
+                    )
+                    Text(
+                        text = "* Costly compared to text generation." +
+                                "\nTap here to monitor your OpenAI API usage.",
+                        style = TextStyle(fontSize = 12.sp),
+                        modifier = Modifier.clickable {
+                            val intent = Intent(Intent.ACTION_VIEW)
+                            intent.data = Uri.parse(API_USAGE_URL)
+                            context.startActivity(intent)
+                        }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(30.dp))
+
             Button(
                 onClick = {
                     val intent = Intent(Intent.ACTION_VIEW)
@@ -250,7 +303,7 @@ fun Settings(
                     context.startActivity(intent)
                 },
             ) {
-                Text(text = "Generate API Key")
+                Text(text = "Generate API Key", style = TextStyle(fontSize = 20.sp))
             }
 
             Spacer(modifier = Modifier.height(15.dp))

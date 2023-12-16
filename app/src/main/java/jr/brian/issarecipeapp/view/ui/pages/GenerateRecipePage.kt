@@ -62,6 +62,7 @@ import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.model.remote.ApiService
 import jr.brian.issarecipeapp.util.API_KEY_REQUIRED
 import jr.brian.issarecipeapp.util.DIETARY_RESTRICTIONS_LABEL
+import jr.brian.issarecipeapp.util.ERROR_IMAGE_URL
 import jr.brian.issarecipeapp.util.FOOD_ALLERGY_LABEL
 import jr.brian.issarecipeapp.util.INGREDIENTS_LABEL
 import jr.brian.issarecipeapp.util.NO_RESPONSE_MSG
@@ -72,6 +73,7 @@ import jr.brian.issarecipeapp.util.customTextSelectionColors
 import jr.brian.issarecipeapp.util.dietaryOptions
 import jr.brian.issarecipeapp.util.generateRecipeQuery
 import jr.brian.issarecipeapp.util.ifBlankUse
+import jr.brian.issarecipeapp.util.isUrl
 import jr.brian.issarecipeapp.util.occasionOptions
 import jr.brian.issarecipeapp.util.randomInfo
 import jr.brian.issarecipeapp.util.randomMealOccasion
@@ -94,6 +96,7 @@ fun GenerateRecipePage(
     dataStore: AppDataStore,
     dietaryRestrictions: String,
     foodAllergies: String,
+    isImageGenerationEnabled: String,
     viewModel: MainViewModel = hiltViewModel(),
     onNavToSettings: () -> Unit
 ) {
@@ -108,6 +111,10 @@ fun GenerateRecipePage(
 
     val allergies = remember {
         mutableStateOf(foodAllergies)
+    }
+
+    val isImageGenEnabled = remember {
+        mutableStateOf(isImageGenerationEnabled)
     }
 
     val ingredients = remember { mutableStateOf("") }
@@ -145,6 +152,19 @@ fun GenerateRecipePage(
                 } else {
                     isEnabled = false
                     backPressedDispatcher?.onBackPressed()
+                }
+            }
+        }
+    }
+
+    val onGenNewImage = fun(includeIngredients: Boolean) {
+        if (isImageGenEnabled.value.toBoolean()) {
+            scope.launch {
+                viewModel.recipeTitle.value?.let { title ->
+                    viewModel.generateImageUrl(
+                        title = title,
+                        ingredients = if (includeIngredients) ingredients.value else null
+                    )
                 }
             }
         }
@@ -194,7 +214,10 @@ fun GenerateRecipePage(
                                 viewModel = viewModel,
                                 loading = loading,
                                 onNavToSettings = onNavToSettings,
-                                focusManager = focusManager
+                                focusManager = focusManager,
+                                onGenerateNewImage = { includeIngredients ->
+                                    onGenNewImage(includeIngredients)
+                                }
                             )
                         }
 
@@ -209,15 +232,8 @@ fun GenerateRecipePage(
                                 imageLoading = imageLoading,
                                 imageUrl = imageUrl,
                                 recipeTitle = recipeTitle,
-                                onGenerateNewImage = {
-                                    scope.launch {
-                                        recipeTitle.value?.let { title ->
-                                            viewModel.generateImageUrl(
-                                                title,
-                                                ingredients.value
-                                            )
-                                        }
-                                    }
+                                onGenerateNewImage = { includeIngredients ->
+                                    onGenNewImage(includeIngredients)
                                 }
                             )
                         }
@@ -256,8 +272,9 @@ fun MealDetails(
     scope: CoroutineScope,
     viewModel: MainViewModel,
     loading: State<Boolean>,
+    focusManager: FocusManager,
     onNavToSettings: () -> Unit,
-    focusManager: FocusManager
+    onGenerateNewImage: (includeIngredients: Boolean) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -573,12 +590,7 @@ fun MealDetails(
                             pagerState.animateScrollToPage(1)
                             generatedRecipe.value = ""
                             viewModel.getChefGptResponse(userPrompt = query)
-                            viewModel.recipeTitle.value?.let {
-                                viewModel.generateImageUrl(
-                                    title = it,
-                                    ingredients = ingredients.value
-                                )
-                            }
+                            onGenerateNewImage(/*Include Ingredients */false)
                             generatedRecipe.value =
                                 viewModel.response.value ?: NO_RESPONSE_MSG
                         }
@@ -644,7 +656,7 @@ fun MealDetails(
                                 pagerState.animateScrollToPage(1)
                                 generatedRecipe.value = ""
                                 viewModel.getChefGptResponse(userPrompt = query)
-                                viewModel.recipeTitle.value?.let { viewModel.generateImageUrl(it) }
+                                onGenerateNewImage(/*Include Ingredients */false)
                                 generatedRecipe.value =
                                     viewModel.response.value ?: NO_RESPONSE_MSG
                             }
@@ -705,7 +717,7 @@ fun RecipeResults(
     imageLoading: State<Boolean>,
     imageUrl: State<String?>,
     recipeTitle: State<String?>,
-    onGenerateNewImage: () -> Unit
+    onGenerateNewImage: (Boolean) -> Unit
 ) {
     val isShowingSavedSuccess = remember {
         mutableStateOf(false)
@@ -826,17 +838,25 @@ fun RecipeResults(
                         )
                     }
 
-                    AnimatedVisibility(visible = !imageLoading.value && !loading.value) {
+                    AnimatedVisibility(
+                        visible = !imageLoading.value
+                                && !loading.value
+                                && imageUrl.value != null
+                    ) {
+                        val isImageUrlValid = imageUrl.value?.isUrl() ?: false
                         GlideImage(
-                            model = imageUrl.value,
+                            model = if (isImageUrlValid) imageUrl.value else ERROR_IMAGE_URL,
                             contentDescription = "Recipe Image",
                             loading = placeholder(ColorPainter(Color.Gray)),
-                            modifier = Modifier.combinedClickable(
-                                onClick = {},
-                                onDoubleClick = {
-                                    onGenerateNewImage()
-                                })
+                            modifier = if (isImageUrlValid) {
+                                Modifier.combinedClickable(
+                                    onClick = {},
+                                    onDoubleClick = {
+                                        onGenerateNewImage(/*Include Ingredients */true)
+                                    })
+                            } else Modifier
                         )
+
                     }
 
                     SelectionContainer {

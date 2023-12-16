@@ -63,6 +63,9 @@ class MainActivity : ComponentActivity() {
                     val askContext =
                         dataStore.getAskContext.collectAsState(initial = "").value
                             ?: ""
+                    val isImageGenerationEnabled =
+                        dataStore.getIsImageGenerationEnabled.collectAsState(initial = "false").value
+                            ?: ""
 
                     ApiService.ApiKey.userApiKey = storedApiKey
 
@@ -73,6 +76,7 @@ class MainActivity : ComponentActivity() {
                             storedDietaryRestrictions = dietaryRestrictions,
                             storedFoodAllergies = foodAllergies,
                             storedAskContext = askContext,
+                            isImageGenerationEnabled = isImageGenerationEnabled,
                             dataStore = dataStore
                         )
                     }
@@ -89,6 +93,7 @@ fun AppUI(
     storedDietaryRestrictions: String,
     storedFoodAllergies: String,
     storedAskContext: String,
+    isImageGenerationEnabled: String,
     dataStore: AppDataStore
 ) {
     val navController = rememberNavController()
@@ -146,6 +151,7 @@ fun AppUI(
                 dataStore = dataStore,
                 dietaryRestrictions = storedDietaryRestrictions,
                 foodAllergies = storedFoodAllergies,
+                isImageGenerationEnabled = isImageGenerationEnabled,
                 onNavToSettings = {
                     navController.navigate(SETTINGS_ROUTE) {
                         launchSingleTop = true
@@ -165,6 +171,7 @@ fun AppUI(
                 apiKey = storedApiKey,
                 dietaryRestrictions = storedDietaryRestrictions,
                 foodAllergies = storedFoodAllergies,
+                isImageGenerationEnabled = isImageGenerationEnabled,
                 dataStore = dataStore,
             )
         })

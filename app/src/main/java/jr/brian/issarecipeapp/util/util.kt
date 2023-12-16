@@ -32,6 +32,7 @@ import jr.brian.issarecipeapp.view.ui.components.RejectedRecipeContentDialog
 import jr.brian.issarecipeapp.view.ui.components.RejectedRecipeHistoryDialog
 import jr.brian.issarecipeapp.view.ui.pages.RejectedRecipeCache
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
+import java.net.URL
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
@@ -213,4 +214,13 @@ fun getSpeechInputIntent(context: Context): Intent? {
         return intent
     }
     return null
+}
+
+fun String.isUrl(): Boolean {
+    return try {
+        URL(this)
+        true
+    } catch (e: Exception) {
+        false
+    }
 }

@@ -7,6 +7,7 @@ const val DEFAULT_IMAGE_SIZE = "1024x1024"
 const val STANDARD_IMAGE_QUALITY = "standard"
 
 const val GENERATE_API_KEY_URL = "https://platform.openai.com/account/api-keys"
+const val API_USAGE_URL = "https://platform.openai.com/usage"
 
 val copyToastMessages = listOf(
     "Your copy is ready for pasta!",
@@ -65,4 +66,6 @@ const val TITLE_IS_REQUIRED = "Title is required."
 const val NO_RESPONSE_MSG = "No response. Please try again."
 const val CONNECTION_TIMEOUT_MSG = "Connection timed out. Please try again."
 const val NO_RECIPES_TO_SWIPE_MSG = "No recipes to swipe at this time. Please check again later."
+const val ERROR_IMAGE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/" +
+        "No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"
 // End Error Messages
