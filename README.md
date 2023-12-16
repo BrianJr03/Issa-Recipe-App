@@ -30,12 +30,14 @@ A simple [recipe app](https://youtu.be/8a2mytF2KMw) powered by ChatGPT. Swipe or
 
 ## Features
 
+- Ask
+  - Ask an AI powered Chef anything culinary related. You will be provided with great anwsers!
+
 - Swipe
   - Browse through randomized recipes and experience Love at first Swipe
   - `breakfast`, `lunch`, and `dinner` recipes will be accessible based on your device's local time
 
-- Generate or Randomize
-
+- Generate or Randomize with Image Generation
   - Create your own recipes based on
     - Party Size
     - Ingredients
@@ -43,6 +45,7 @@ A simple [recipe app](https://youtu.be/8a2mytF2KMw) powered by ChatGPT. Swipe or
     - Dietary Restrictions
     - Food Allergies
     - Additional Info (if needed)
+    - *An image based on your recipe will be generated*
    
 - Favorites
    - Filter via search
