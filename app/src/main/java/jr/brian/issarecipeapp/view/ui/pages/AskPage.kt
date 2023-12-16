@@ -47,7 +47,8 @@ fun AskPage(
     storedApiKey: String,
     storedAskContext: String,
     viewModel: MainViewModel = hiltViewModel(),
-    onNavToAskContext: () -> Unit
+    onNavToAskContext: () -> Unit,
+    onNavToSettings: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -56,7 +57,6 @@ fun AskPage(
     val promptText = remember { mutableStateOf("") }
 
     val isEmptyPromptDialogShowing = remember { mutableStateOf(false) }
-    val isSettingsDialogShowing = remember { mutableStateOf(false) }
     val isChatGptTyping = remember { mutableStateOf(false) }
 
     val interactionSource = remember { MutableInteractionSource() }
@@ -89,7 +89,7 @@ fun AskPage(
             }
         }
         if (storedApiKey.isEmpty()) {
-            isSettingsDialogShowing.value = true
+            onNavToSettings()
             context.showToast(API_KEY_REQUIRED)
         } else if (promptText.value.isEmpty() || promptText.value.isBlank()) {
             isEmptyPromptDialogShowing.value = true
@@ -142,7 +142,6 @@ fun AskPage(
                 onResetAllChats = {
                     chats.clear()
                     dao.removeAllChats()
-                    isSettingsDialogShowing.value = false
                     Toast.makeText(
                         context,
                         "Conversation has been reset.",

@@ -129,6 +129,11 @@ fun AppUI(
                     navController.navigate(ASK_CONTEXT_ROUTE) {
                         launchSingleTop = true
                     }
+                },
+                onNavToSettings = {
+                    navController.navigate(SETTINGS_ROUTE) {
+                        launchSingleTop = true
+                    }
                 }
             )
         })
@@ -141,11 +146,12 @@ fun AppUI(
                 dataStore = dataStore,
                 dietaryRestrictions = storedDietaryRestrictions,
                 foodAllergies = storedFoodAllergies,
-            ) {
-                navController.navigate(SETTINGS_ROUTE) {
-                    launchSingleTop = true
+                onNavToSettings = {
+                    navController.navigate(SETTINGS_ROUTE) {
+                        launchSingleTop = true
+                    }
                 }
-            }
+            )
         })
         composable(FAV_RECIPES_ROUTE, content = {
             FavRecipesPage(dao = dao)

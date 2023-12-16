@@ -3,7 +3,9 @@ package jr.brian.issarecipeapp.view.ui.pages
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,12 +40,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
@@ -71,6 +77,7 @@ import jr.brian.issarecipeapp.util.randomInfo
 import jr.brian.issarecipeapp.util.randomMealOccasion
 import jr.brian.issarecipeapp.util.showToast
 import jr.brian.issarecipeapp.view.ui.components.DefaultTextField
+import jr.brian.issarecipeapp.view.ui.components.LottieRecipe
 import jr.brian.issarecipeapp.view.ui.components.PresetOptionsDialog
 import jr.brian.issarecipeapp.view.ui.components.RecipeNameDialog
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
@@ -117,6 +124,9 @@ fun GenerateRecipePage(
     val focusManager = LocalFocusManager.current
 
     val loading = viewModel.loading.collectAsState()
+    val imageLoading = viewModel.imageLoading.collectAsState()
+    val imageUrl = viewModel.imageUrlResponse.collectAsState()
+    val recipeTitle = viewModel.recipeTitle.collectAsState()
 
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -195,7 +205,20 @@ fun GenerateRecipePage(
                                 hasBeenSaved = hasBeenSaved,
                                 pagerState = pagerState,
                                 scope = scope,
-                                loading = loading
+                                loading = loading,
+                                imageLoading = imageLoading,
+                                imageUrl = imageUrl,
+                                recipeTitle = recipeTitle,
+                                onGenerateNewImage = {
+                                    scope.launch {
+                                        recipeTitle.value?.let { title ->
+                                            viewModel.generateImageUrl(
+                                                title,
+                                                ingredients.value
+                                            )
+                                        }
+                                    }
+                                }
                             )
                         }
                     }
@@ -547,11 +570,17 @@ fun MealDetails(
                         focusManager.clearFocus()
 
                         scope.launch {
+                            pagerState.animateScrollToPage(1)
                             generatedRecipe.value = ""
                             viewModel.getChefGptResponse(userPrompt = query)
+                            viewModel.recipeTitle.value?.let {
+                                viewModel.generateImageUrl(
+                                    title = it,
+                                    ingredients = ingredients.value
+                                )
+                            }
                             generatedRecipe.value =
                                 viewModel.response.value ?: NO_RESPONSE_MSG
-                            pagerState.animateScrollToPage(1)
                         }
 
                         hasBeenSaved.value = false
@@ -612,11 +641,12 @@ fun MealDetails(
                             focusManager.clearFocus()
 
                             scope.launch {
+                                pagerState.animateScrollToPage(1)
                                 generatedRecipe.value = ""
                                 viewModel.getChefGptResponse(userPrompt = query)
+                                viewModel.recipeTitle.value?.let { viewModel.generateImageUrl(it) }
                                 generatedRecipe.value =
                                     viewModel.response.value ?: NO_RESPONSE_MSG
-                                pagerState.animateScrollToPage(1)
                             }
 
                             hasBeenSaved.value = false
@@ -660,7 +690,10 @@ fun MealDetails(
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(
+    ExperimentalPagerApi::class, ExperimentalGlideComposeApi::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 fun RecipeResults(
     dao: RecipeDao,
@@ -668,7 +701,11 @@ fun RecipeResults(
     hasBeenSaved: MutableState<Boolean>,
     pagerState: PagerState,
     scope: CoroutineScope,
-    loading: State<Boolean>
+    loading: State<Boolean>,
+    imageLoading: State<Boolean>,
+    imageUrl: State<String?>,
+    recipeTitle: State<String?>,
+    onGenerateNewImage: () -> Unit
 ) {
     val isShowingSavedSuccess = remember {
         mutableStateOf(false)
@@ -689,30 +726,36 @@ fun RecipeResults(
 
     RecipeNameDialog(
         isShowing = isShowingSaveNameDialog,
-        name = name.value,
-    ) {
-        if (it.isNotBlank()) {
-            dao.insertRecipe(Recipe(generatedRecipe.value, it))
-            isShowingSavedSuccess.value = true
-            isShowingSaveNameDialog.value = false
-            name.value = ""
-            scope.launch {
-                delay(1000)
-                isShowingSavedSuccess.value = false
-                delay(500)
-                hasBeenSaved.value = true
+        name = name,
+        onConfirmClick = {
+            if (it.isNotBlank()) {
+                dao.insertRecipe(
+                    Recipe(
+                        recipe = generatedRecipe.value,
+                        name = it,
+                        imageUrl = imageUrl.value.orEmpty()
+                    )
+                )
+                isShowingSavedSuccess.value = true
+                isShowingSaveNameDialog.value = false
+                name.value = ""
+                scope.launch {
+                    delay(1000)
+                    isShowingSavedSuccess.value = false
+                    delay(500)
+                    hasBeenSaved.value = true
+                }
+            } else {
+                isShowingSaveNameError.value = true
             }
-        } else {
-            isShowingSaveNameError.value = true
         }
-    }
+    )
 
     Column(
         modifier = Modifier
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Row(verticalAlignment = Alignment.CenterVertically) {
             Button(onClick = {
                 scope.launch {
@@ -720,12 +763,9 @@ fun RecipeResults(
                 }
             }) {
                 if (loading.value) {
-                    CircularProgressIndicator(
-                        color = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    Text("Generating Recipe")
                 } else {
-                    Text("Back")
+                    Text(if (imageLoading.value) "Generating Image" else "Back")
                 }
             }
 
@@ -737,6 +777,9 @@ fun RecipeResults(
                 IconButton(
                     modifier = Modifier.padding(start = 30.dp),
                     onClick = {
+                        if (name.value.isBlank()) {
+                            name.value = recipeTitle.value.orEmpty()
+                        }
                         isShowingSaveNameDialog.value = !isShowingSaveNameDialog.value
                     }) {
                     Icon(
@@ -758,25 +801,50 @@ fun RecipeResults(
             }
         }
 
-        LazyColumn {
+        AnimatedVisibility(visible = imageLoading.value) {
+            Column {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "The recipe image may take longer to display.",
+                    fontSize = 16.sp
+                )
+            }
+        }
+
+        LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
             items(1) {
                 CompositionLocalProvider(
                     LocalTextSelectionColors provides customTextSelectionColors
                 ) {
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    AnimatedVisibility(visible = imageLoading.value || loading.value) {
+                        LottieRecipe(
+                            isShowing = remember {
+                                mutableStateOf(true)
+                            }, modifier = Modifier.size(250.dp)
+                        )
+                    }
+
+                    AnimatedVisibility(visible = !imageLoading.value && !loading.value) {
+                        GlideImage(
+                            model = imageUrl.value,
+                            contentDescription = "Recipe Image",
+                            loading = placeholder(ColorPainter(Color.Gray)),
+                            modifier = Modifier.combinedClickable(
+                                onClick = {},
+                                onDoubleClick = {
+                                    onGenerateNewImage()
+                                })
+                        )
+                    }
+
                     SelectionContainer {
                         Text(
                             generatedRecipe.value,
                             modifier = Modifier.padding(15.dp)
                         )
                     }
-                }
-
-                if (generatedRecipe.value.isBlank()) {
-                    Text(
-                        "No Generated Recipe",
-                        fontSize = 20.sp,
-                        color = BlueIsh
-                    )
                 }
             }
         }

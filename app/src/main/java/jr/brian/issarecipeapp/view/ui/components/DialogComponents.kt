@@ -29,10 +29,14 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
@@ -110,34 +114,31 @@ fun PresetOptionsDialog(
 @Composable
 fun RecipeNameDialog(
     isShowing: MutableState<Boolean>,
-    name: String,
+    name: MutableState<String>,
     onConfirmClick: (String) -> Unit
 ) {
-    val nameString = remember {
-        mutableStateOf(name)
-    }
     ShowDialog(
         title = "Name this Recipe",
         content = {
             DefaultTextField(
                 label = "name",
-                value = nameString.value,
+                value = name.value,
                 onValueChange = {
-                    nameString.value = it
+                    name.value = it
                 },
                 maxCount = RECIPE_NAME_MAX_CHAR_COUNT
             )
         },
         confirmButton = {
             Button(onClick = {
-                onConfirmClick(nameString.value)
+                onConfirmClick(name.value)
             }) {
                 Text(text = "Save")
             }
         },
         dismissButton = {
             Button(onClick = {
-                nameString.value = ""
+                name.value = ""
                 isShowing.value = false
             }) {
                 Text(text = "Cancel")
@@ -147,7 +148,7 @@ fun RecipeNameDialog(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun RecipeContentDialog(
     dao: RecipeDao,
@@ -188,7 +189,7 @@ fun RecipeContentDialog(
 
     val saveNewName = {
         scope.launch {
-            val newRecipe = Recipe(recipe.recipe, newRecipeName.value)
+            val newRecipe = Recipe(recipe.recipe, newRecipeName.value, recipe.imageUrl)
             favRecipes[favRecipes.indexOf(recipe)] = newRecipe
             dao.updateRecipe(recipe = newRecipe)
             isRenameFieldShowing.value = false
@@ -262,6 +263,12 @@ fun RecipeContentDialog(
                             maxCount = RECIPE_NAME_MAX_CHAR_COUNT
                         )
                     }
+
+                    GlideImage(
+                        model = recipe.imageUrl,
+                        contentDescription = "Recipe Image",
+                        loading = placeholder(ColorPainter(Color.Gray)),
+                    )
 
                     CompositionLocalProvider(
                         LocalTextSelectionColors provides customTextSelectionColors

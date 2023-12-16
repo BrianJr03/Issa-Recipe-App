@@ -97,6 +97,7 @@ fun generateRecipeQuery(
         "Also note that I am allergic to $foodAllergies. " +
         "Please include the estimated calories, fat, carbs, protein " +
         "and preparation / cook time. " +
+        "Also, title the recipe and surround it in '✨' for easy extraction. " +
         if (additionalInfo.isNotBlank())
             "Lastly, here is some additional info for this recipe:" +
                     " $additionalInfo. Thanks!"

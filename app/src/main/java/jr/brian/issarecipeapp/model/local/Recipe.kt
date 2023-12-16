@@ -6,7 +6,8 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "recipes")
 data class Recipe(
     @PrimaryKey @JvmField val recipe: String,
-    @JvmField var name: String
+    @JvmField var name: String,
+    @JvmField var imageUrl: String = ""
 )
 
 fun getRandomRecipes(recipes: List<Recipe>, count: Int): List<Recipe> {

@@ -2,6 +2,10 @@ package jr.brian.issarecipeapp.util
 
 const val GPT_3_5_TURBO = "gpt-3.5-turbo"
 
+const val DALL_E_3 = "dall-e-3"
+const val DEFAULT_IMAGE_SIZE = "1024x1024"
+const val STANDARD_IMAGE_QUALITY = "standard"
+
 const val GENERATE_API_KEY_URL = "https://platform.openai.com/account/api-keys"
 
 val copyToastMessages = listOf(
@@ -55,9 +59,10 @@ const val SWIPE_SCREEN_LABEL = "Love at First Swipe"
 // End Labels
 
 // Error Messages
-const val API_KEY_REQUIRED = "API Key is required"
-const val NO_RESPONSE_MSG = "No response. Please try again."
-const val NO_RECIPES_TO_SWIPE_MSG = "No recipes to swipe at this time. Please check again later."
-const val CONNECTION_TIMEOUT_MSG = "Connection timed out. Please try again."
 const val ERROR = "error"
+const val API_KEY_REQUIRED = "API Key is required"
+const val TITLE_IS_REQUIRED = "Title is required."
+const val NO_RESPONSE_MSG = "No response. Please try again."
+const val CONNECTION_TIMEOUT_MSG = "Connection timed out. Please try again."
+const val NO_RECIPES_TO_SWIPE_MSG = "No recipes to swipe at this time. Please check again later."
 // End Error Messages
