@@ -3,7 +3,6 @@ package jr.brian.issarecipeapp.view.ui.pages
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -150,7 +149,6 @@ fun FavRecipesPage(dao: RecipeDao) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecipeGrid(
     dao: RecipeDao,
@@ -184,7 +182,10 @@ fun RecipeGrid(
     ) {
         DefaultTextField(
             label = "Search Recipes",
-            value = recipeQuery,
+            value = recipeQuery.value,
+            onValueChange = {
+                recipeQuery.value = it
+            },
             modifier = Modifier.padding(top = 15.dp)
         )
 
@@ -193,7 +194,6 @@ fun RecipeGrid(
         } else {
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(2),
-                verticalArrangement = Arrangement.Center
             ) {
                 items(filteredRecipes.value.size) { index ->
                     val recipe = filteredRecipes.value.reversed()[index]
@@ -230,7 +230,6 @@ fun FoldersComingSoon(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Suppress("unused")
 @Composable
 fun FoldersGrid(
@@ -265,7 +264,10 @@ fun FoldersGrid(
     ) {
         DefaultTextField(
             label = "Search Folders",
-            value = folderQuery,
+            value = folderQuery.value,
+            onValueChange = {
+                folderQuery.value = it
+            },
             modifier = Modifier.padding(top = 15.dp)
         )
 
@@ -287,7 +289,6 @@ fun FoldersGrid(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 LazyVerticalStaggeredGrid(
                     columns = StaggeredGridCells.Fixed(2),
-                    verticalArrangement = Arrangement.Center
                 ) {
                     items(filteredFolders.value.size) { index ->
                         val folder = filteredFolders.value.reversed()[index]
@@ -329,22 +330,22 @@ fun RecipeBox(
         }
     }
 
-        Box(modifier = modifier
-            .padding(16.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(BlueIsh)
-            .clickable {
-                isShowingRecipe.value = !isShowingRecipe.value
-            }) {
-            Text(
-                text = recipe.name,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
-                textAlign = TextAlign.Center,
-                fontSize = 20.sp
-            )
+    Box(modifier = modifier
+        .padding(16.dp)
+        .clip(RoundedCornerShape(10.dp))
+        .background(BlueIsh)
+        .clickable {
+            isShowingRecipe.value = !isShowingRecipe.value
+        }) {
+        Text(
+            text = recipe.name,
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            textAlign = TextAlign.Center,
+            fontSize = 20.sp
+        )
 
     }
 }

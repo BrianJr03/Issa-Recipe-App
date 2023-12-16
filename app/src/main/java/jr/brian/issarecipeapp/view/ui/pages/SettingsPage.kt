@@ -110,19 +110,22 @@ fun SettingsPage(
             apiKey = key,
             dietaryRestrictions = dietary,
             foodAllergies = allergies,
-            onApiKeyValueChange = {
+            onApiKeyValueChange = { str ->
+                key.value = str
                 scope.launch {
-                    dataStore.saveApiKey(it)
+                    dataStore.saveApiKey(str)
                 }
             },
-            onDietaryValueChange = {
+            onDietaryValueChange = { str ->
+                dietary.value = str
                 scope.launch {
-                    dataStore.saveDietaryRestrictions(it.lowercase())
+                    dataStore.saveDietaryRestrictions(str.lowercase())
                 }
             },
-            onAllergiesValueChange = {
+            onAllergiesValueChange = { str ->
+                allergies.value = str
                 scope.launch {
-                    dataStore.saveFoodAllergies(it.lowercase())
+                    dataStore.saveFoodAllergies(str.lowercase())
                 }
             },
             modifier = Modifier
@@ -151,10 +154,6 @@ fun Settings(
     val focusManager = LocalFocusManager.current
 
     val scope = rememberCoroutineScope()
-
-    val showErrorColorAPiKey = remember {
-        mutableStateOf(false)
-    }
 
     val isDietaryOptionsShowing = remember {
         mutableStateOf(false)
@@ -199,7 +198,7 @@ fun Settings(
 
             DefaultTextField(
                 label = "Save $DIETARY_RESTRICTIONS_LABEL",
-                value = dietaryRestrictions,
+                value = dietaryRestrictions.value,
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = onDietaryValueChange,
                 trailingIcon = {
@@ -218,7 +217,7 @@ fun Settings(
 
             DefaultTextField(
                 label = "Save $FOOD_ALLERGY_LABEL",
-                value = foodAllergies,
+                value = foodAllergies.value,
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = onAllergiesValueChange,
                 trailingIcon = {
@@ -239,10 +238,9 @@ fun Settings(
 
             DefaultTextField(
                 label = API_KEY_LABEL,
-                value = apiKey,
+                value = apiKey.value,
                 onValueChange = onApiKeyValueChange,
                 modifier = Modifier.fillMaxWidth(),
-                isShowingErrorColor = showErrorColorAPiKey
             )
 
             Button(

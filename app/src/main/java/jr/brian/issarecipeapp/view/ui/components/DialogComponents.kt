@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,10 +28,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import jr.brian.issarecipeapp.R
 import jr.brian.issarecipeapp.model.local.Recipe
 import jr.brian.issarecipeapp.model.local.RecipeDao
@@ -74,7 +80,7 @@ fun PresetOptionsDialog(
     ShowDialog(
         title = "Preset $title",
         content = {
-            LazyColumn() {
+            LazyColumn {
                 items(options.size) { index ->
                     val option = options[index]
                     Row(
@@ -108,23 +114,24 @@ fun PresetOptionsDialog(
 @Composable
 fun RecipeNameDialog(
     isShowing: MutableState<Boolean>,
-    isShowingErrorColor: MutableState<Boolean>,
     name: MutableState<String>,
-    onConfirmClick: () -> Unit
+    onConfirmClick: (String) -> Unit
 ) {
     ShowDialog(
         title = "Name this Recipe",
         content = {
             DefaultTextField(
                 label = "name",
-                value = name,
-                isShowingErrorColor = isShowingErrorColor,
+                value = name.value,
+                onValueChange = {
+                    name.value = it
+                },
                 maxCount = RECIPE_NAME_MAX_CHAR_COUNT
             )
         },
         confirmButton = {
             Button(onClick = {
-                onConfirmClick()
+                onConfirmClick(name.value)
             }) {
                 Text(text = "Save")
             }
@@ -132,7 +139,6 @@ fun RecipeNameDialog(
         dismissButton = {
             Button(onClick = {
                 name.value = ""
-                isShowingErrorColor.value = false
                 isShowing.value = false
             }) {
                 Text(text = "Cancel")
@@ -142,7 +148,7 @@ fun RecipeNameDialog(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun RecipeContentDialog(
     dao: RecipeDao,
@@ -183,7 +189,7 @@ fun RecipeContentDialog(
 
     val saveNewName = {
         scope.launch {
-            val newRecipe = Recipe(recipe.recipe, newRecipeName.value)
+            val newRecipe = Recipe(recipe.recipe, newRecipeName.value, recipe.imageUrl)
             favRecipes[favRecipes.indexOf(recipe)] = newRecipe
             dao.updateRecipe(recipe = newRecipe)
             isRenameFieldShowing.value = false
@@ -250,11 +256,19 @@ fun RecipeContentDialog(
                     AnimatedVisibility(visible = isRenameFieldShowing.value) {
                         DefaultTextField(
                             label = "Rename Recipe",
-                            value = newRecipeName,
-                            isShowingErrorColor = showTextFieldErrorColor,
+                            value = newRecipeName.value,
+                            onValueChange = {
+                                newRecipeName.value = it
+                            },
                             maxCount = RECIPE_NAME_MAX_CHAR_COUNT
                         )
                     }
+
+                    GlideImage(
+                        model = recipe.imageUrl,
+                        contentDescription = "Recipe Image",
+                        loading = placeholder(ColorPainter(Color.Gray)),
+                    )
 
                     CompositionLocalProvider(
                         LocalTextSelectionColors provides customTextSelectionColors
@@ -330,7 +344,7 @@ fun RejectedRecipeHistoryDialog(
         title = if (recipes.isEmpty()) NO_REJECTED_RECIPES_DIALOG_LABEL
         else REJECTED_RECIPES_DIALOG_LABEL,
         content = {
-            LazyColumn() {
+            LazyColumn {
                 items(recipes.size) { index ->
                     val selectedRecipe = recipes.reversed()[index]
                     Row(
@@ -425,4 +439,72 @@ fun FolderContentDialog(
     onDelete: () -> Unit
 ) {
 
+}
+
+@Composable
+fun EmptyPromptDialog(
+    isShowing: MutableState<Boolean>,
+    modifier: Modifier = Modifier
+) {
+    ShowDialog(
+        title = "Please provide a prompt",
+        modifier = modifier,
+        content = {
+            Column {
+                Text(
+                    "The text field can not be empty.",
+                    fontSize = 16.sp,
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    isShowing.value = false
+                }) {
+                Text(text = "Dismiss", color = Color.White)
+            }
+        },
+        dismissButton = {},
+        isShowing = isShowing
+    )
+}
+
+@Composable
+fun DeleteDialog(
+    title: String,
+    isShowing: MutableState<Boolean>,
+    modifier: Modifier = Modifier,
+    onDeleteClick: () -> Unit
+) {
+    ShowDialog(
+        title = title,
+        modifier = modifier,
+        content = {
+            Column {
+                Text(
+                    "This can't be undone.",
+                    fontSize = 16.sp,
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onDeleteClick()
+                    isShowing.value = false
+                }) {
+                Text(text = "Delete", color = Color.White)
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    isShowing.value = false
+                }) {
+                Text(text = "Cancel", color = Color.White)
+            }
+        },
+        isShowing = isShowing
+    )
 }

@@ -27,8 +27,17 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
     private val _response = MutableStateFlow<String?>(null)
     val response = _response.asStateFlow()
 
+    private val _recipeTitle = MutableStateFlow<String?>(null)
+    val recipeTitle = _recipeTitle.asStateFlow()
+
+    private val _imageUrlResponse = MutableStateFlow<String?>(null)
+    val imageUrlResponse = _imageUrlResponse.asStateFlow()
+
     private val _loading = MutableStateFlow(false)
     val loading = _loading.asStateFlow()
+
+    private val _imageLoading = MutableStateFlow(false)
+    val imageLoading = _imageLoading.asStateFlow()
 
     private val _swipeLoading = MutableStateFlow(false)
     val swipeLoading = _swipeLoading.asStateFlow()
@@ -38,10 +47,31 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
 
     private var initialized = false
 
-    suspend fun getChefGptResponse(userPrompt: String) {
+    suspend fun generateImageUrl(
+        title: String,
+        ingredients: String? = null
+    ) {
+        _imageLoading.emit(true)
+        _imageUrlResponse.emit(
+            repository.generateImageUrl(title, ingredients)
+        )
+        _imageLoading.emit(false)
+    }
+
+    suspend fun getChefGptResponse(
+        userPrompt: String,
+        context: String? = null
+    ) {
         _loading.emit(true)
-        val aiResponse = repository.getChatGptResponse(userPrompt = userPrompt)
-        _response.emit(aiResponse)
+        _response.emit(
+            repository.getChatGptResponse(
+                userPrompt = userPrompt,
+                system = context
+            )
+        )
+        _recipeTitle.emit(
+            _response.value?.let { extractRecipeTitle(it) }
+        )
         _loading.emit(false)
     }
 
@@ -62,6 +92,12 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
                 refreshRecipes()
             }
         }
+    }
+
+    private fun extractRecipeTitle(input: String): String {
+        val regex = Regex("""✨(.*?)✨""")
+        val matchResult = regex.find(input)
+        return matchResult?.groupValues?.get(1) ?: "Food"
     }
 
     private suspend fun refreshRecipes() {
