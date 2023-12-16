@@ -56,6 +56,7 @@ A simple [recipe app](https://youtu.be/8a2mytF2KMw) powered by ChatGPT. Swipe or
     - Save Custom Dietary Restrictions
     - Save Custom Food Allergies
     - Save OpenAI API Key
+    - Enable Image Generation
 
 ## Prerequisites
 
