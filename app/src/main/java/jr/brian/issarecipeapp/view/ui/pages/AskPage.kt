@@ -83,6 +83,7 @@ fun AskPage(
     }
 
     val sendOnClick = {
+        focusManager.clearFocus()
         if (chats.isEmpty()) {
             scope.launch {
                 chatListState.animateScrollToItem(0)
