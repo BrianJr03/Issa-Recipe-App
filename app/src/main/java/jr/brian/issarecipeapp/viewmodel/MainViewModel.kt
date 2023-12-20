@@ -97,8 +97,7 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
     private fun extractRecipeTitle(input: String): String {
         val regex = Regex("""✨(.*?)✨""")
         val matchResult = regex.find(input)
-        val title =matchResult?.groupValues?.get(1) ?: "Food"
-        return title.replace(" ", "")
+        return matchResult?.groupValues?.get(1)?.trim() ?: "Food"
     }
 
     private suspend fun refreshRecipes() {
