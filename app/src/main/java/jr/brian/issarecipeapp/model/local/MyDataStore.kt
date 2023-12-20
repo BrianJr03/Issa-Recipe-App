@@ -13,8 +13,8 @@ import javax.inject.Inject
 class AppDataStore @Inject constructor(private val context: Context) {
     companion object {
         private val Context.dataStore:
-                DataStore<Preferences> by preferencesDataStore("api-key-data-store")
-        val API_KEY = stringPreferencesKey("user_api_key")
+                DataStore<Preferences> by preferencesDataStore("app-data-store")
+        val API_KEY = stringPreferencesKey("user-api-key")
         val DIETARY_RESTRICTIONS = stringPreferencesKey("dietary-restrictions")
         val FOOD_ALLERGIES = stringPreferencesKey("food-allergies")
         val ASK_CONTEXT = stringPreferencesKey("ask-context")

@@ -3,7 +3,7 @@ package jr.brian.issarecipeapp.model.repository
 import jr.brian.issarecipeapp.util.DEFAULT_IMAGE_SIZE
 
 interface Repository {
-    suspend fun getChatGptResponse(
+    suspend fun getAskResponse(
         userPrompt: String,
         system: String? = null
     ): String

@@ -7,11 +7,11 @@ class RepoImpl : Repository {
         private val apiService = ApiService
     }
 
-    override suspend fun getChatGptResponse(
+    override suspend fun getAskResponse(
         userPrompt: String,
         system: String?
     ): String {
-        return apiService.getChatGptResponse(
+        return apiService.getAskResponse(
             userPrompt = userPrompt,
             system = system
         )

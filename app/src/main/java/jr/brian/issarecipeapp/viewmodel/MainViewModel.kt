@@ -58,13 +58,13 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
         _imageLoading.emit(false)
     }
 
-    suspend fun getChefGptResponse(
+    suspend fun getAskResponse(
         userPrompt: String,
         context: String? = null
     ) {
         _loading.emit(true)
         _response.emit(
-            repository.getChatGptResponse(
+            repository.getAskResponse(
                 userPrompt = userPrompt,
                 system = context
             )
@@ -97,7 +97,8 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
     private fun extractRecipeTitle(input: String): String {
         val regex = Regex("""✨(.*?)✨""")
         val matchResult = regex.find(input)
-        return matchResult?.groupValues?.get(1) ?: "Food"
+        val title =matchResult?.groupValues?.get(1) ?: "Food"
+        return title.replace(" ", "")
     }
 
     private suspend fun refreshRecipes() {

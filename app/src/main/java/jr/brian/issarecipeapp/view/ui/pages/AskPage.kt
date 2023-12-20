@@ -108,7 +108,7 @@ fun AskPage(
                 chats.add(myChat)
                 dao.insertChat(myChat)
                 chatListState.animateScrollToItem(chats.size)
-                viewModel.getChefGptResponse(userPrompt = prompt, storedAskContext)
+                viewModel.getAskResponse(userPrompt = prompt, storedAskContext)
                 val chatGptChat = Chat(
                     fullTimeStamp = LocalDateTime.now().toString(),
                     text = viewModel.response.value ?: NO_RESPONSE_MSG,

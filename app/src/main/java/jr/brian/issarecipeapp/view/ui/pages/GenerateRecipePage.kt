@@ -589,7 +589,7 @@ fun MealDetails(
                         scope.launch {
                             pagerState.animateScrollToPage(1)
                             generatedRecipe.value = ""
-                            viewModel.getChefGptResponse(userPrompt = query)
+                            viewModel.getAskResponse(userPrompt = query)
                             onGenerateNewImage(/*Include Ingredients */false)
                             generatedRecipe.value =
                                 viewModel.response.value ?: NO_RESPONSE_MSG
@@ -655,7 +655,7 @@ fun MealDetails(
                             scope.launch {
                                 pagerState.animateScrollToPage(1)
                                 generatedRecipe.value = ""
-                                viewModel.getChefGptResponse(userPrompt = query)
+                                viewModel.getAskResponse(userPrompt = query)
                                 onGenerateNewImage(/*Include Ingredients */false)
                                 generatedRecipe.value =
                                     viewModel.response.value ?: NO_RESPONSE_MSG
