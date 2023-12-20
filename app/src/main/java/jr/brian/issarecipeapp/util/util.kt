@@ -32,7 +32,6 @@ import jr.brian.issarecipeapp.view.ui.components.RejectedRecipeContentDialog
 import jr.brian.issarecipeapp.view.ui.components.RejectedRecipeHistoryDialog
 import jr.brian.issarecipeapp.view.ui.pages.RejectedRecipeCache
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
-import java.net.URL
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
@@ -83,6 +82,18 @@ val randomMealOccasion = occasionOptions.random()
 
 val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
 val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM.dd.yy")
+
+fun generateAskQuery(
+    system: String? = null
+) = "You are a 5 star chef. " +
+        if (system.isNullOrBlank()) "" else "$system " +
+                "\nLastly, only respond to questions that are about " +
+                "preparing food, " +
+                "cooking food, " +
+                "providing recipes, " +
+                "providing culinary advice, " +
+                "or anything that generally has to do with any aspect of your job." +
+                "Politely decline anything outside of that list."
 
 fun generateRecipeQuery(
     occasion: String,
@@ -196,11 +207,6 @@ fun SwipeHeaderLabel(dao: RecipeDao) {
     }
 }
 
-fun Context.showToast(text: String, isLongToast: Boolean = false) {
-    val duration = if (isLongToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
-    Toast.makeText(this, text, duration).show()
-}
-
 fun getSpeechInputIntent(context: Context): Intent? {
     if (!SpeechRecognizer.isRecognitionAvailable(context)) {
         Toast.makeText(context, "Speech not available", Toast.LENGTH_SHORT).show()
@@ -214,13 +220,4 @@ fun getSpeechInputIntent(context: Context): Intent? {
         return intent
     }
     return null
-}
-
-fun String.isUrl(): Boolean {
-    return try {
-        URL(this)
-        true
-    } catch (e: Exception) {
-        false
-    }
 }
