@@ -9,11 +9,13 @@ class RepoImpl : Repository {
 
     override suspend fun getAskResponse(
         userPrompt: String,
-        system: String?
+        system: String?,
+        model: String
     ): String {
         return apiService.getAskResponse(
             userPrompt = userPrompt,
-            system = system
+            system = system,
+            model = model
         )
     }
 

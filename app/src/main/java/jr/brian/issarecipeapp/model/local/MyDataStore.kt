@@ -17,6 +17,7 @@ class AppDataStore @Inject constructor(private val context: Context) {
         val API_KEY = stringPreferencesKey("user-api-key")
         val DIETARY_RESTRICTIONS = stringPreferencesKey("dietary-restrictions")
         val FOOD_ALLERGIES = stringPreferencesKey("food-allergies")
+        val GPT_MODEL = stringPreferencesKey("gpt-model")
         val ASK_CONTEXT = stringPreferencesKey("ask-context")
         val IS_IMAGE_GENERATION_ENABLED = stringPreferencesKey("is-image-generation-enabled")
     }
@@ -68,6 +69,16 @@ class AppDataStore @Inject constructor(private val context: Context) {
     suspend fun saveFoodAllergies(value: String) {
         context.dataStore.edit { preferences ->
             preferences[FOOD_ALLERGIES] = value
+        }
+    }
+
+    val getGptModel: Flow<String?> = context.dataStore.data.map { preferences ->
+        preferences[GPT_MODEL]
+    }
+
+    suspend fun saveGptModel(value: String) {
+        context.dataStore.edit { preferences ->
+            preferences[GPT_MODEL] = value
         }
     }
 }

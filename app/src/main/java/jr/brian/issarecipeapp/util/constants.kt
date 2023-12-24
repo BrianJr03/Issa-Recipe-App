@@ -1,6 +1,7 @@
 package jr.brian.issarecipeapp.util
 
 const val GPT_3_5_TURBO = "gpt-3.5-turbo"
+const val GPT_4 = "gpt-4"
 
 const val DALL_E_3 = "dall-e-3"
 const val DEFAULT_IMAGE_SIZE = "1024x1024"
@@ -9,13 +10,7 @@ const val STANDARD_IMAGE_QUALITY = "standard"
 const val GENERATE_API_KEY_URL = "https://platform.openai.com/account/api-keys"
 const val API_USAGE_URL = "https://platform.openai.com/usage"
 
-val copyToastMessages = listOf(
-    "Your copy is ready for pasta!",
-    "What are you waiting for? Paste!",
-    "Your clipboard has been blessed.",
-    "Copied!",
-    "Copied, the text has been."
-)
+const val DEFAULT_RECIPE_TITLE = "Food"
 
 // Routes
 const val HOME_ROUTE = "home"
@@ -51,6 +46,7 @@ const val API_KEY_LABEL = "OpenAI API Key"
 const val PARTY_SIZE_LABEL = "Party Size *"
 const val DIETARY_RESTRICTIONS_LABEL = "Dietary Restrictions"
 const val FOOD_ALLERGY_LABEL = "Food Allergies"
+const val GPT_LABEL = "GPT Model"
 const val INGREDIENTS_LABEL = "Ingredients *"
 const val REJECTED_RECIPES_DIALOG_LABEL = "Rejected Recipes $SAD_FACE_EMOJI"
 const val NO_REJECTED_RECIPES_DIALOG_LABEL = "No Rejected Recipes $COOL_FACE_EMOJI"

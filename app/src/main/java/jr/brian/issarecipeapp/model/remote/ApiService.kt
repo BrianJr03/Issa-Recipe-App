@@ -1,6 +1,5 @@
 package jr.brian.issarecipeapp.model.remote
 
-import android.annotation.SuppressLint
 import android.util.Log
 import jr.brian.issarecipeapp.util.DALL_E_3
 import jr.brian.issarecipeapp.util.DEFAULT_IMAGE_SIZE
@@ -22,14 +21,15 @@ interface ApiService {
     companion object {
         suspend fun getAskResponse(
             userPrompt: String,
-            system: String? = null
+            system: String? = null,
+            model: String = GPT_3_5_TURBO
         ): String {
             var aiResponse: String
             try {
                 withContext(Dispatchers.IO) {
                     val key = ApiKey.userApiKey
                     val request = ChatBot.ChatCompletionRequest(
-                        model = GPT_3_5_TURBO,
+                        model = model,
                         systemContent = generateAskQuery(system = system)
                     )
                     val bot = CachedChatBot(
@@ -47,10 +47,10 @@ interface ApiService {
                         "This could indicate no/very poor internet connection. " +
                         "Please check your connection and try again."
             }
+            Log.i("myTag-model", model)
             return aiResponse
         }
 
-        @SuppressLint("LogNotTimber")
         suspend fun generateImageUrl(
             title: String,
             ingredients: String? = null,

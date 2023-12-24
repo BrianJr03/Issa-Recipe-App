@@ -22,6 +22,7 @@ import jr.brian.issarecipeapp.util.ASK_CONTEXT_ROUTE
 import jr.brian.issarecipeapp.util.ASK_ROUTE
 import jr.brian.issarecipeapp.util.SWIPE_RECIPES_ROUTE
 import jr.brian.issarecipeapp.util.FAV_RECIPES_ROUTE
+import jr.brian.issarecipeapp.util.GPT_3_5_TURBO
 import jr.brian.issarecipeapp.util.HOME_ROUTE
 import jr.brian.issarecipeapp.util.MEAL_DETAILS_ROUTE
 import jr.brian.issarecipeapp.util.SETTINGS_ROUTE
@@ -60,6 +61,9 @@ class MainActivity : ComponentActivity() {
                     val foodAllergies =
                         dataStore.getFoodAllergies.collectAsState(initial = "none").value
                             ?: "none"
+                    val gptModel =
+                        dataStore.getGptModel.collectAsState(initial = GPT_3_5_TURBO).value
+                            ?: GPT_3_5_TURBO
                     val askContext =
                         dataStore.getAskContext.collectAsState(initial = "").value
                             ?: ""
@@ -72,9 +76,10 @@ class MainActivity : ComponentActivity() {
                     dao?.let {
                         AppUI(
                             dao = it,
-                            storedApiKey = storedApiKey,
-                            storedDietaryRestrictions = dietaryRestrictions,
-                            storedFoodAllergies = foodAllergies,
+                            savedApiKey = storedApiKey,
+                            savedDietaryRestrictions = dietaryRestrictions,
+                            savedFoodAllergies = foodAllergies,
+                            savedGptModel = gptModel,
                             storedAskContext = askContext,
                             isImageGenerationEnabled = isImageGenerationEnabled,
                             dataStore = dataStore
@@ -89,9 +94,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppUI(
     dao: RecipeDao,
-    storedApiKey: String,
-    storedDietaryRestrictions: String,
-    storedFoodAllergies: String,
+    savedApiKey: String,
+    savedDietaryRestrictions: String,
+    savedFoodAllergies: String,
+    savedGptModel: String,
     storedAskContext: String,
     isImageGenerationEnabled: String,
     dataStore: AppDataStore
@@ -128,8 +134,9 @@ fun AppUI(
         composable(ASK_ROUTE, content = {
             AskPage(
                 dao = dao,
-                storedApiKey = storedApiKey,
-                storedAskContext = storedAskContext,
+                savedApiKey = savedApiKey,
+                savedAskContext = storedAskContext,
+                savedModel = savedGptModel,
                 onNavToAskContext = {
                     navController.navigate(ASK_CONTEXT_ROUTE) {
                         launchSingleTop = true
@@ -149,8 +156,9 @@ fun AppUI(
             GenerateRecipePage(
                 dao = dao,
                 dataStore = dataStore,
-                dietaryRestrictions = storedDietaryRestrictions,
-                foodAllergies = storedFoodAllergies,
+                dietaryRestrictions = savedDietaryRestrictions,
+                foodAllergies = savedFoodAllergies,
+                gptModel = savedGptModel,
                 isImageGenerationEnabled = isImageGenerationEnabled,
                 onNavToSettings = {
                     navController.navigate(SETTINGS_ROUTE) {
@@ -168,9 +176,10 @@ fun AppUI(
         composable(SETTINGS_ROUTE, content = {
             SettingsPage(
                 dao = dao,
-                apiKey = storedApiKey,
-                dietaryRestrictions = storedDietaryRestrictions,
-                foodAllergies = storedFoodAllergies,
+                apiKey = savedApiKey,
+                dietaryRestrictions = savedDietaryRestrictions,
+                foodAllergies = savedFoodAllergies,
+                gptModel = savedGptModel,
                 isImageGenerationEnabled = isImageGenerationEnabled,
                 dataStore = dataStore,
             )

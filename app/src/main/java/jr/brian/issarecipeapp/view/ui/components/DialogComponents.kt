@@ -71,14 +71,14 @@ private fun ShowDialog(
 }
 
 @Composable
-fun PresetOptionsDialog(
+fun OptionsDialog(
     isShowing: MutableState<Boolean>,
     title: String,
     options: List<String>,
     onSelectItem: (String) -> Unit,
 ) {
     ShowDialog(
-        title = "Preset $title",
+        title = title,
         content = {
             LazyColumn {
                 items(options.size) { index ->

@@ -5,7 +5,8 @@ import jr.brian.issarecipeapp.util.DEFAULT_IMAGE_SIZE
 interface Repository {
     suspend fun getAskResponse(
         userPrompt: String,
-        system: String? = null
+        system: String? = null,
+        model: String
     ): String
 
     suspend fun generateImageUrl(

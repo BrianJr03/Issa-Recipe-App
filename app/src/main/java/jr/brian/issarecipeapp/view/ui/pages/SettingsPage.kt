@@ -16,8 +16,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -47,10 +48,12 @@ import jr.brian.issarecipeapp.util.API_USAGE_URL
 import jr.brian.issarecipeapp.util.DIETARY_RESTRICTIONS_LABEL
 import jr.brian.issarecipeapp.util.FOOD_ALLERGY_LABEL
 import jr.brian.issarecipeapp.util.GENERATE_API_KEY_URL
+import jr.brian.issarecipeapp.util.GPT_LABEL
 import jr.brian.issarecipeapp.util.allergyOptions
 import jr.brian.issarecipeapp.util.dietaryOptions
+import jr.brian.issarecipeapp.util.modelOptions
 import jr.brian.issarecipeapp.view.ui.components.DefaultTextField
-import jr.brian.issarecipeapp.view.ui.components.PresetOptionsDialog
+import jr.brian.issarecipeapp.view.ui.components.OptionsDialog
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import jr.brian.issarecipeapp.view.ui.theme.Crimson
 import kotlinx.coroutines.launch
@@ -62,6 +65,7 @@ fun SettingsPage(
     apiKey: String,
     dietaryRestrictions: String,
     foodAllergies: String,
+    gptModel: String,
     isImageGenerationEnabled: String,
     dataStore: AppDataStore
 ) {
@@ -77,6 +81,10 @@ fun SettingsPage(
 
     val allergies = remember {
         mutableStateOf(foodAllergies)
+    }
+
+    val model = remember {
+        mutableStateOf(gptModel)
     }
 
     val isImageGenEnabled = remember {
@@ -118,6 +126,7 @@ fun SettingsPage(
             apiKey = key,
             dietaryRestrictions = dietary,
             foodAllergies = allergies,
+            gptModel = model,
             isImageGenEnabled = isImageGenEnabled,
             onApiKeyValueChange = { str ->
                 key.value = str
@@ -135,6 +144,12 @@ fun SettingsPage(
                 allergies.value = str
                 scope.launch {
                     dataStore.saveFoodAllergies(str.lowercase())
+                }
+            },
+            onModelValueChange = { str ->
+                model.value = str
+                scope.launch {
+                    dataStore.saveGptModel(str.lowercase())
                 }
             },
             onEnableImageGenCheckChange = { isChecked ->
@@ -160,9 +175,11 @@ fun Settings(
     dietaryRestrictions: MutableState<String>,
     isImageGenEnabled: MutableState<String>,
     foodAllergies: MutableState<String>,
+    gptModel: MutableState<String>,
     onApiKeyValueChange: (String) -> Unit,
     onDietaryValueChange: (String) -> Unit,
     onAllergiesValueChange: (String) -> Unit,
+    onModelValueChange: (String) -> Unit,
     onEnableImageGenCheckChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -179,6 +196,10 @@ fun Settings(
         mutableStateOf(false)
     }
 
+    val isModelOptionsShowing = remember {
+        mutableStateOf(false)
+    }
+
     val isDeleteFavsInfoShowing = remember {
         mutableStateOf(true)
     }
@@ -191,7 +212,7 @@ fun Settings(
         mutableStateOf(isImageGenEnabled.value.toBoolean())
     }
 
-    PresetOptionsDialog(
+    OptionsDialog(
         isShowing = isDietaryOptionsShowing,
         title = "Restrictions",
         options = dietaryOptions,
@@ -200,13 +221,22 @@ fun Settings(
             onDietaryValueChange(it)
         })
 
-    PresetOptionsDialog(
+    OptionsDialog(
         isShowing = isAllergyOptionsShowing,
         title = "Allergies",
         options = allergyOptions,
         onSelectItem = {
             foodAllergies.value = it
             onAllergiesValueChange(it)
+        })
+
+    OptionsDialog(
+        isShowing = isModelOptionsShowing,
+        title = "GPT Models",
+        options = modelOptions,
+        onSelectItem = {
+            gptModel.value = it
+            onModelValueChange(it)
         })
 
     LazyColumn(
@@ -217,7 +247,7 @@ fun Settings(
             Spacer(modifier = Modifier.height(15.dp))
 
             DefaultTextField(
-                label = "Save $DIETARY_RESTRICTIONS_LABEL",
+                label = DIETARY_RESTRICTIONS_LABEL,
                 value = dietaryRestrictions.value,
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = onDietaryValueChange,
@@ -229,6 +259,7 @@ fun Settings(
                         modifier = Modifier.clickable {
                             focusManager.clearFocus()
                             isAllergyOptionsShowing.value = false
+                            isModelOptionsShowing.value = false
                             isDietaryOptionsShowing.value = !isDietaryOptionsShowing.value
                         }
                     )
@@ -236,7 +267,7 @@ fun Settings(
             )
 
             DefaultTextField(
-                label = "Save $FOOD_ALLERGY_LABEL",
+                label = FOOD_ALLERGY_LABEL,
                 value = foodAllergies.value,
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = onAllergiesValueChange,
@@ -248,22 +279,54 @@ fun Settings(
                         modifier = Modifier.clickable {
                             focusManager.clearFocus()
                             isDietaryOptionsShowing.value = false
+                            isModelOptionsShowing.value = false
                             isAllergyOptionsShowing.value = !isAllergyOptionsShowing.value
                         }
                     )
                 }
             )
 
-            Spacer(modifier = Modifier.height(15.dp))
+            SettingsDivider()
 
             DefaultTextField(
                 label = API_KEY_LABEL,
                 value = apiKey.value,
                 onValueChange = onApiKeyValueChange,
                 modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_open_in_new_24),
+                        tint = BlueIsh,
+                        contentDescription = "View GPT models",
+                        modifier = Modifier.clickable {
+                            val intent = Intent(Intent.ACTION_VIEW)
+                            intent.data = Uri.parse(GENERATE_API_KEY_URL)
+                            context.startActivity(intent)
+                        }
+                    )
+                }
             )
 
-            Spacer(modifier = Modifier.height(15.dp))
+            DefaultTextField(
+                label = GPT_LABEL,
+                value = gptModel.value,
+                readOnly = true,
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = onModelValueChange,
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_menu_24),
+                        tint = BlueIsh,
+                        contentDescription = "View GPT models",
+                        modifier = Modifier.clickable {
+                            focusManager.clearFocus()
+                            isDietaryOptionsShowing.value = false
+                            isAllergyOptionsShowing.value = false
+                            isModelOptionsShowing.value = !isModelOptionsShowing.value
+                        }
+                    )
+                }
+            )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Switch(
@@ -294,19 +357,9 @@ fun Settings(
                 }
             }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            Button(
-                onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW)
-                    intent.data = Uri.parse(GENERATE_API_KEY_URL)
-                    context.startActivity(intent)
-                },
-            ) {
-                Text(text = "Generate API Key", style = TextStyle(fontSize = 20.sp))
-            }
-
-            Spacer(modifier = Modifier.height(15.dp))
+            SettingsDivider()
 
             Column {
                 when (!isDeleteFavsInfoShowing.value) {
@@ -333,5 +386,18 @@ fun Settings(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun SettingsDivider() {
+    Column {
+        Spacer(modifier = Modifier.height(15.dp))
+        Divider(
+            color = BlueIsh,
+            thickness = 5.dp,
+            modifier = Modifier.width(300.dp)
+        )
+        Spacer(modifier = Modifier.height(15.dp))
     }
 }

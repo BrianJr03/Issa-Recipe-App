@@ -65,6 +65,11 @@ val allergyOptions = listOf(
     "none"
 )
 
+val modelOptions = listOf(
+    GPT_3_5_TURBO,
+    GPT_4
+)
+
 private val infoExamples =
     listOf(
         "Include a 3 day meal plan.",

@@ -27,6 +27,7 @@ fun DefaultTextField(
     value: String,
     modifier: Modifier = Modifier,
     maxCount: Int = Int.MAX_VALUE,
+    readOnly: Boolean = false,
     isError: MutableState<Boolean> = mutableStateOf(false),
     onValueChange: ((str: String) -> Unit)?,
     onDone: (() -> Unit)? = null,
@@ -43,6 +44,7 @@ fun DefaultTextField(
         ),
         value = value,
         isError = isError.value,
+        readOnly = readOnly,
         onValueChange = { str ->
             if (str.length <= maxCount) {
                 if (str.isNotBlank()) {

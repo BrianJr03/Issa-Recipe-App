@@ -80,7 +80,7 @@ import jr.brian.issarecipeapp.util.randomMealOccasion
 import jr.brian.issarecipeapp.util.showToast
 import jr.brian.issarecipeapp.view.ui.components.DefaultTextField
 import jr.brian.issarecipeapp.view.ui.components.LottieRecipe
-import jr.brian.issarecipeapp.view.ui.components.PresetOptionsDialog
+import jr.brian.issarecipeapp.view.ui.components.OptionsDialog
 import jr.brian.issarecipeapp.view.ui.components.RecipeNameDialog
 import jr.brian.issarecipeapp.view.ui.theme.BlueIsh
 import jr.brian.issarecipeapp.view.ui.theme.Crimson
@@ -96,6 +96,7 @@ fun GenerateRecipePage(
     dataStore: AppDataStore,
     dietaryRestrictions: String,
     foodAllergies: String,
+    gptModel: String,
     isImageGenerationEnabled: String,
     viewModel: MainViewModel = hiltViewModel(),
     onNavToSettings: () -> Unit
@@ -111,6 +112,10 @@ fun GenerateRecipePage(
 
     val allergies = remember {
         mutableStateOf(foodAllergies)
+    }
+
+    val model = remember {
+        mutableStateOf(gptModel)
     }
 
     val isImageGenEnabled = remember {
@@ -205,6 +210,7 @@ fun GenerateRecipePage(
                                 partySize = servingSize,
                                 dietaryRestrictions = dietary,
                                 foodAllergies = allergies,
+                                gptModel = model,
                                 ingredients = ingredients,
                                 additionalInfo = additionalInfo,
                                 generatedRecipe = generatedRecipe,
@@ -264,6 +270,7 @@ fun MealDetails(
     partySize: MutableState<String>,
     dietaryRestrictions: MutableState<String>,
     foodAllergies: MutableState<String>,
+    gptModel: MutableState<String>,
     ingredients: MutableState<String>,
     additionalInfo: MutableState<String>,
     generatedRecipe: MutableState<String>,
@@ -314,7 +321,7 @@ fun MealDetails(
     val isOtherFocused = remember { mutableStateOf(false) }
     val isTapInfoShowing = remember { mutableStateOf(false) }
 
-    PresetOptionsDialog(
+    OptionsDialog(
         isShowing = isOccasionOptionsShowing,
         title = "Occasions",
         options = occasionOptions,
@@ -322,7 +329,7 @@ fun MealDetails(
             occasion.value = it
         })
 
-    PresetOptionsDialog(
+    OptionsDialog(
         isShowing = isDietaryOptionsShowing,
         title = "Restrictions",
         options = dietaryOptions,
@@ -333,7 +340,7 @@ fun MealDetails(
             }
         })
 
-    PresetOptionsDialog(
+    OptionsDialog(
         isShowing = isAllergyOptionsShowing,
         title = "Allergies",
         options = allergyOptions,
@@ -589,7 +596,10 @@ fun MealDetails(
                         scope.launch {
                             pagerState.animateScrollToPage(1)
                             generatedRecipe.value = ""
-                            viewModel.getAskResponse(userPrompt = query)
+                            viewModel.getAskResponse(
+                                userPrompt = query,
+                                model = gptModel.value
+                            )
                             onGenerateNewImage(/*Include Ingredients */false)
                             generatedRecipe.value =
                                 viewModel.response.value ?: NO_RESPONSE_MSG
@@ -655,7 +665,10 @@ fun MealDetails(
                             scope.launch {
                                 pagerState.animateScrollToPage(1)
                                 generatedRecipe.value = ""
-                                viewModel.getAskResponse(userPrompt = query)
+                                viewModel.getAskResponse(
+                                    userPrompt = query,
+                                    model = gptModel.value
+                                )
                                 onGenerateNewImage(/*Include Ingredients */false)
                                 generatedRecipe.value =
                                     viewModel.response.value ?: NO_RESPONSE_MSG

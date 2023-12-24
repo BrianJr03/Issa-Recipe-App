@@ -12,6 +12,7 @@ import jr.brian.issarecipeapp.model.local.getRandomRecipes
 import jr.brian.issarecipeapp.model.remote.retrieveRecipes
 import jr.brian.issarecipeapp.model.repository.Repository
 import jr.brian.issarecipeapp.util.CONNECTION_TIMEOUT_MSG
+import jr.brian.issarecipeapp.util.DEFAULT_RECIPE_TITLE
 import jr.brian.issarecipeapp.util.ERROR
 import jr.brian.issarecipeapp.util.MAX_CARDS_IN_STACK
 import jr.brian.issarecipeapp.util.NO_RECIPES_TO_SWIPE_MSG
@@ -60,13 +61,15 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
 
     suspend fun getAskResponse(
         userPrompt: String,
-        context: String? = null
+        context: String? = null,
+        model: String
     ) {
         _loading.emit(true)
         _response.emit(
             repository.getAskResponse(
                 userPrompt = userPrompt,
-                system = context
+                system = context,
+                model = model
             )
         )
         _recipeTitle.emit(
@@ -97,7 +100,7 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
     private fun extractRecipeTitle(input: String): String {
         val regex = Regex("""✨(.*?)✨""")
         val matchResult = regex.find(input)
-        return matchResult?.groupValues?.get(1)?.trim() ?: "Food"
+        return matchResult?.groupValues?.get(1)?.trim() ?: DEFAULT_RECIPE_TITLE
     }
 
     private suspend fun refreshRecipes() {

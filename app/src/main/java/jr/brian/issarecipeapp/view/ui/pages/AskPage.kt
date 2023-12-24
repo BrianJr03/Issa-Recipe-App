@@ -44,8 +44,9 @@ import jr.brian.issarecipeapp.viewmodel.MainViewModel
 @Composable
 fun AskPage(
     dao: RecipeDao,
-    storedApiKey: String,
-    storedAskContext: String,
+    savedApiKey: String,
+    savedAskContext: String,
+    savedModel: String,
     viewModel: MainViewModel = hiltViewModel(),
     onNavToAskContext: () -> Unit,
     onNavToSettings: () -> Unit,
@@ -89,7 +90,7 @@ fun AskPage(
                 chatListState.animateScrollToItem(0)
             }
         }
-        if (storedApiKey.isEmpty()) {
+        if (savedApiKey.isEmpty()) {
             onNavToSettings()
             context.showToast(API_KEY_REQUIRED)
         } else if (promptText.value.isEmpty() || promptText.value.isBlank()) {
@@ -108,7 +109,11 @@ fun AskPage(
                 chats.add(myChat)
                 dao.insertChat(myChat)
                 chatListState.animateScrollToItem(chats.size)
-                viewModel.getAskResponse(userPrompt = prompt, storedAskContext)
+                viewModel.getAskResponse(
+                    userPrompt = prompt,
+                    savedAskContext,
+                    model = savedModel
+                )
                 val chatGptChat = Chat(
                     fullTimeStamp = LocalDateTime.now().toString(),
                     text = viewModel.response.value ?: NO_RESPONSE_MSG,

@@ -88,19 +88,19 @@ fun HomePage(
 
                         Spacer(modifier = Modifier.height(25.dp))
 
-                        Text(
-                            fontSize = 30.sp,
-                            color = BlueIsh,
-                            text = "Swipe",
-                            modifier = Modifier.clickable {
-                                isMenuShowing.value = false
-                                scope.launch {
-                                    onNavToSwipe()
-                                }
-                            }
-                        )
-
-                        Spacer(modifier = Modifier.height(25.dp))
+//                        Text(
+//                            fontSize = 30.sp,
+//                            color = BlueIsh,
+//                            text = "Swipe",
+//                            modifier = Modifier.clickable {
+//                                isMenuShowing.value = false
+//                                scope.launch {
+//                                    onNavToSwipe()
+//                                }
+//                            }
+//                        )
+//
+//                        Spacer(modifier = Modifier.height(25.dp))
 
                         Text(
                             fontSize = 30.sp,
