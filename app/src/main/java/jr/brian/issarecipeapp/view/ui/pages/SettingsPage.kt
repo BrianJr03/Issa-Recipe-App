@@ -339,13 +339,14 @@ fun Settings(
                 )
                 Column {
                     Text(
-                        text = "Enable Image Generation", style = TextStyle(
+                        text = "Auto Image Generation", style = TextStyle(
                             color = BlueIsh,
                             fontSize = 20.sp
                         )
                     )
                     Text(
-                        text = "* Costly compared to text generation." +
+                        text = "Used when generating recipes in Generate." +
+                                "\nThis is costly compared to text generation." +
                                 "\nTap here to monitor your OpenAI API usage.",
                         style = TextStyle(fontSize = 12.sp),
                         modifier = Modifier.clickable {

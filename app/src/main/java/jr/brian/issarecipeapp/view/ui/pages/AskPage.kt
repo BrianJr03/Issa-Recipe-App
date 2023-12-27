@@ -111,8 +111,9 @@ fun AskPage(
                 chatListState.animateScrollToItem(chats.size)
                 viewModel.getAskResponse(
                     userPrompt = prompt,
-                    savedAskContext,
-                    model = savedModel
+                    context = savedAskContext,
+                    model = savedModel,
+                    dao = dao
                 )
                 val chatGptChat = Chat(
                     fullTimeStamp = LocalDateTime.now().toString(),

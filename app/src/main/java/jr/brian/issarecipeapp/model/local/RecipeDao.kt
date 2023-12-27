@@ -36,6 +36,8 @@ interface RecipeDao {
     @Query("DELETE FROM folders")
     fun removeAllFolders()
 
+    // ----  CHAT ---- //
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertChat(chat: Chat)
 

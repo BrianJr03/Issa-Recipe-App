@@ -8,6 +8,7 @@ import javax.inject.Inject
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
 import jr.brian.issarecipeapp.model.local.Recipe
+import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.model.local.getRandomRecipes
 import jr.brian.issarecipeapp.model.remote.retrieveRecipes
 import jr.brian.issarecipeapp.model.repository.Repository
@@ -60,6 +61,7 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
     }
 
     suspend fun getAskResponse(
+        dao: RecipeDao? = null,
         userPrompt: String,
         context: String? = null,
         model: String
@@ -69,7 +71,8 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
             repository.getAskResponse(
                 userPrompt = userPrompt,
                 system = context,
-                model = model
+                model = model,
+                dao = dao
             )
         )
         _recipeTitle.emit(

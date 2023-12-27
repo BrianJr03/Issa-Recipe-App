@@ -1,5 +1,6 @@
 package jr.brian.issarecipeapp.model.repository
 
+import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.model.remote.ApiService
 
 class RepoImpl : Repository {
@@ -8,6 +9,7 @@ class RepoImpl : Repository {
     }
 
     override suspend fun getAskResponse(
+        dao: RecipeDao?,
         userPrompt: String,
         system: String?,
         model: String
@@ -15,7 +17,8 @@ class RepoImpl : Repository {
         return apiService.getAskResponse(
             userPrompt = userPrompt,
             system = system,
-            model = model
+            model = model,
+            dao = dao
         )
     }
 

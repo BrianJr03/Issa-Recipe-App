@@ -12,6 +12,8 @@ const val API_USAGE_URL = "https://platform.openai.com/usage"
 
 const val DEFAULT_RECIPE_TITLE = "Food"
 
+const val DEFAULT_CHAT_ROLE = "user"
+
 // Routes
 const val HOME_ROUTE = "home"
 const val ASK_ROUTE = "ask"

@@ -1,6 +1,7 @@
 package jr.brian.issarecipeapp.model.remote
 
 import android.util.Log
+import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.util.DALL_E_3
 import jr.brian.issarecipeapp.util.DEFAULT_IMAGE_SIZE
 import jr.brian.issarecipeapp.util.GPT_3_5_TURBO
@@ -20,6 +21,7 @@ interface ApiService {
 
     companion object {
         suspend fun getAskResponse(
+            dao: RecipeDao? = null,
             userPrompt: String,
             system: String? = null,
             model: String = GPT_3_5_TURBO
@@ -33,8 +35,9 @@ interface ApiService {
                         systemContent = generateAskQuery(system = system)
                     )
                     val bot = CachedChatBot(
-                        key,
-                        request
+                        apiKey = key,
+                        request = request,
+                        prevChats = dao?.getChats()?.takeLast(10) ?: emptyList()
                     )
                     aiResponse = bot.generateResponse(userPrompt)
                 }
