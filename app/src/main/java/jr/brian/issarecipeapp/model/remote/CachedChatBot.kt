@@ -15,6 +15,7 @@ class CachedChatBot(
 ) : ChatBot(apiKey) {
     private val previousChats = prevChats
     private val chatRole = DEFAULT_CHAT_ROLE
+
     fun generateResponse(
         content: String,
         role: String = chatRole
