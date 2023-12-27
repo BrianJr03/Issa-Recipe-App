@@ -26,8 +26,9 @@ const val SETTINGS_ROUTE = "settings"
 
 // Max Values
 const val MAX_CARDS_IN_STACK = 7
-const val RECIPE_NAME_MAX_CHAR_COUNT = 40
 const val PARTY_SIZE_MAX_CHAR_COUNT = 4
+const val RECIPE_NAME_MAX_CHAR_COUNT = 40
+const val NUM_OF_CHATS_USED_FOR_HISTORY = 10
 // End Max Values
 
 // Meal Hours
@@ -45,7 +46,7 @@ const val COOL_FACE_EMOJI = "\uD83D\uDE0E"
 
 // Labels
 const val API_KEY_LABEL = "OpenAI API Key"
-const val PARTY_SIZE_LABEL = "Party Size *"
+const val PARTY_SIZE_LABEL = "Party Size"
 const val DIETARY_RESTRICTIONS_LABEL = "Dietary Restrictions"
 const val FOOD_ALLERGY_LABEL = "Food Allergies"
 const val GPT_LABEL = "GPT Model"

@@ -5,6 +5,7 @@ import jr.brian.issarecipeapp.model.local.RecipeDao
 import jr.brian.issarecipeapp.util.DALL_E_3
 import jr.brian.issarecipeapp.util.DEFAULT_IMAGE_SIZE
 import jr.brian.issarecipeapp.util.GPT_3_5_TURBO
+import jr.brian.issarecipeapp.util.NUM_OF_CHATS_USED_FOR_HISTORY
 import jr.brian.issarecipeapp.util.STANDARD_IMAGE_QUALITY
 import jr.brian.issarecipeapp.util.TITLE_IS_REQUIRED
 import jr.brian.issarecipeapp.util.generateAskQuery
@@ -37,7 +38,8 @@ interface ApiService {
                     val bot = CachedChatBot(
                         apiKey = key,
                         request = request,
-                        prevChats = dao?.getChats()?.takeLast(10) ?: emptyList()
+                        prevChats = dao?.getChats()?.takeLast(NUM_OF_CHATS_USED_FOR_HISTORY)
+                            ?: emptyList()
                     )
                     aiResponse = bot.generateResponse(userPrompt)
                 }

@@ -289,10 +289,6 @@ fun MealDetails(
         mutableStateOf(false)
     }
 
-    val showErrorColorPartySize = remember {
-        mutableStateOf(false)
-    }
-
     val isOccasionOptionsShowing = remember {
         mutableStateOf(false)
     }
@@ -370,7 +366,6 @@ fun MealDetails(
                     onValueChange = {
                         partySize.value = it
                     },
-                    isError = showErrorColorPartySize,
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged {
@@ -566,11 +561,12 @@ fun MealDetails(
                         onNavToSettings()
                     } else if (ingredients.value.isBlank()) {
                         showErrorColorIngredients.value = true
-                    } else if (partySize.value.toIntOrNull() == null) {
-                        showErrorColorPartySize.value = true
                     } else if (!loading.value) {
                         showErrorColorIngredients.value = false
-                        showErrorColorPartySize.value = false
+
+                        if (partySize.value.toIntOrNull() == null) {
+                            partySize.value = "1"
+                        }
 
                         scope.launch {
                             delay(300)
@@ -600,7 +596,7 @@ fun MealDetails(
                                 userPrompt = query,
                                 model = gptModel.value
                             )
-                            onGenerateNewImage(/*Include Ingredients */false)
+                            onGenerateNewImage(false)
                             generatedRecipe.value =
                                 viewModel.response.value ?: NO_RESPONSE_MSG
                         }
@@ -657,7 +653,6 @@ fun MealDetails(
                                 additionalInfo = additionalInfo.value,
                             )
 
-                            showErrorColorPartySize.value = false
                             showErrorColorIngredients.value = false
 
                             focusManager.clearFocus()
@@ -669,7 +664,7 @@ fun MealDetails(
                                     userPrompt = query,
                                     model = gptModel.value
                                 )
-                                onGenerateNewImage(/*Include Ingredients */false)
+                                onGenerateNewImage(false)
                                 generatedRecipe.value =
                                     viewModel.response.value ?: NO_RESPONSE_MSG
                             }
@@ -865,7 +860,7 @@ fun RecipeResults(
                                 Modifier.combinedClickable(
                                     onClick = {},
                                     onDoubleClick = {
-                                        onGenerateNewImage(/*Include Ingredients */true)
+                                        onGenerateNewImage(true)
                                     })
                             } else Modifier
                         )
